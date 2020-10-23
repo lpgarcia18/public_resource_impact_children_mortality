@@ -1,0 +1,2 @@
+link para busca mortalidade gbd
+http://ghdx.healthdata.org/gbd-results-tool?params=gbd-api-2019-permalink/4c28e14bc173a6003a3f3f57e92387f2
