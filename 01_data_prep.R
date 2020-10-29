@@ -37,13 +37,16 @@ fertility <- read_csv("bases/IHME/IHME_GBD_2019_FERTILITY_1950_2019_TFR/IHME_GBD
 
 # WHO DATA ----------------------------------------------------------------
 #http://apps.who.int/nha/database/Select/Indicators/en
-#Domestic General Government Health Expenditure (GGHE-D) per Capita in PPP Int$
-#External Health Expenditure (EXT) per Capita in PPP Int$
-#General government expenditure - in current PPP per capita
-#Gross Domestic Product - in current PPP per capita
-#Out-of-Pocket Expenditure (OOPS) per Capita in PPP Int$
-who <- read_csv("bases/WHO/EXP_WHO.csv")
+#Current Health Expenditure (CHE) as % Gross Domestic Product (GDP)
+#Out-of-pocket (OOPS) as % of Current Health Expenditure (CHE)
+#External Health Expenditure (EXT) as % of Current Health Expenditure (CHE)
+#Domestic General Government Health Expenditure (GGHE-D) as % Gross Domestic Product (GDP)
+#General Government Expenditure (GGE) as % Gross Domestic Product (GDP)
+#Gross Domestic Product
 
+#Relation
+#in million constant (2017) US$
+who <- read_csv("bases/WHO/EXP_WHO.csv")
 
 # World Bank Database -----------------------------------------------------
 new_cache <- wbcache()
@@ -52,12 +55,6 @@ new_cache <- wbcache()
 #OUTCOME
 #Net ODA received (% of GDP)
 ODA <- wb(indicator = "DT.ODA.ODAT.GN.ZS", startdate = 2012, enddate = 2019)
-#GDP deflator: linked series (base year varies by country)
-deflator <- wb(indicator = "NY.GDP.DEFL.ZS.AD", startdate = 2012, enddate = 2019)
-
-
-#Tax revenue (% of GDP)
-TAX <- wb(indicator = "GC.TAX.TOTL.GD.ZS", startdate = 2012, enddate = 2019)
 
 #ECONOMIC/INCOME
 #GINI index (World Bank estimate)
@@ -141,6 +138,14 @@ SURFACE <- wb(indicator = "AG.SRF.TOTL.K2", startdate = 2012, enddate = 2014)
 income_class <- read_csv("bases/WB/income_class_serie.csv")
 
 
+#Geografical centroid
+coord_countries <- world
+xy <- st_coordinates(st_centroid(coord_countries))
+coord_countries <- cbind(coord_countries, xy)
+coord_countries <- dplyr::select(coord_countries, name_long,X,Y)
+coord_countries$geom <- NULL
+names(coord_countries)[1] <- "LOCATION"
+
 #########################################################################
 #Variable construction
 #########################################################################
@@ -210,69 +215,184 @@ names(population_65)[1] <- "LOCATION"
 base <- merge(deaths, fertility, by = "LOCATION", all.x = T)
 base <- merge(base, population_65, by = "LOCATION", all.x = T)
 
-#Adjusting countries names to merge with World Bank data
-base[which(base$LOCATION == "The Bahamas"), 1] <- "Bahamas, The"
-base[which(base$LOCATION == "Cape Verde"), 1] <- "Cabo Verde"
-base[which(base$LOCATION == "Congo"), 1] <- "Congo, Rep."
-base[which(base$LOCATION == "Egypt"), 1] <- "Egypt, Arab Rep."
-base[which(base$LOCATION == "South Korea"), 1] <- "Korea, Rep."
-base[which(base$LOCATION == "Kyrgyzstan"), 1] <- "Kyrgyz Republic"
-base[which(base$LOCATION == "Federated States of Micronesia"), 1] <- "Micronesia, Fed. Sts."
-base[which(base$LOCATION == "Macedonia"), 1] <- "North Macedonia"
-base[which(base$LOCATION == "Slovakia"), 1] <- "Slovak Republic"
-base[which(base$LOCATION == "Saint Lucia"), 1] <- "St. Lucia"
-base[which(base$LOCATION == "Saint Vincent and the Grenadines"), 1] <- "St. Vincent and the Grenadines"
+
+#########################################################################
+#Variable construction
+#########################################################################
+#Adjusting countries names from WB to merge with IHME 
+countries_ihme <- data.frame(IHME = unique(number_deaths$location))
+countries_wb <- data.frame(WB = unique(base$LOCATION),
+			   WB_2 = unique(base$LOCATION))
 
 
-#General government expenditure, Public health expenditure
-who[which(who$Indicators == "Domestic General Government Health Expenditure (GGHE-D) per Capita in PPP Int$"), 2] <- "DGGHE_PPP"
-who[which(who$Indicators == "External Health Expenditure (EXT) per Capita in PPP Int$"), 2] <- "EXT_PPP"
-who[which(who$Indicators == "General government expenditure"), 2] <- "GGE_PPP"
-who[which(who$Indicators == "Gross Domestic Product"), 2] <- "GDP_PPP"
-who[which(who$Indicators == "Out-of-Pocket Expenditure (OOPS) per Capita in PPP Int$"), 2] <- "OOP_PPP"
+countries <- merge(countries_ihme, countries_wb, by.x = "IHME", by.y = "WB_2", all = T) 
+#The names were the same in boath databases
+countries <- NULL
+
+#Adjusting countries names from who to merge with IHME
+countries_who <- data.frame(WHO = unique(who$Countries),
+			    WHO_2 = unique(who$Countries))
+countries <- merge(countries_ihme, countries_who, by.x = "IHME", by.y = "WHO_2", all = T)
+
+who[which(who$Countries == "Samoa"), 1] <- "American Samoa"
+who[which(who$Countries == "Bolivia Plurinational States of"), 1] <- "Bolivia (Plurinational State of)"
+who[which(who$Countries == "Cabo Verde Republic of"), 1] <- "Cabo Verde"
+who[which(who$Countries == "Czech Republic"), 1] <- "Czechia"
+who[which(who$Countries == "Republic of Korea"), 1] <- "Democratic People's Republic of Korea"
+who[which(who$Countries == "Iran"), 1] <- "Iran (Islamic Republic of)"
+who[which(who$Countries == "The Republic of North Macedonia"), 1] <- "North Macedonia"
+who[which(who$Countries == "Syria"), 1] <- "Syrian Arab Republic"
+
+#Countries in IHME database but not in who's
+
+# "Bermuda"
+# "Greenland"
+# "Guam"
+# "Lybia"
+# "Montenegro"
+# "Northern Mariana Islands"
+# "Palestine"
+# "Puerto Rico"
+# "Somalia"
+# "Taiwan (Province of China)"
+# "Tokelau"
+# "United States Virgin Islands"
+countries <- NULL
+
+
+
+#Adjusting countries names from WB INCOME CLASS to merge with IHME
+countries_icome_class <- data.frame(WB_INCOME_CLASS = unique(income_class$LOCATION),
+			    WB_INCOME_CLASS_2 = unique(income_class$LOCATION))
+countries <- merge(countries_ihme, countries_icome_class, by.x = "IHME", by.y = "WB_INCOME_CLASS_2", all = T)
+
+income_class[which(income_class$LOCATION == "Bahamas, The"), 1] <- "Bahamas"
+income_class[which(income_class$LOCATION == "Bolivia"), 1] <- "Bolivia (Plurinational State of)"
+income_class[which(income_class$LOCATION == "Congo, Rep."), 1] <- "Congo"
+income_class[which(income_class$LOCATION == "Czech Republic"), 1] <- "Czechia"
+income_class[which(income_class$LOCATION == "Korea, Dem. Rep."), 1] <- "Democratic People's Republic of Korea"
+income_class[which(income_class$LOCATION == "Congo, Dem. Rep"), 1] <- "Democratic Republic of the Congo"
+income_class[which(income_class$LOCATION == "Egypt, Arab Rep."), 1] <- "Egypt"
+income_class[which(income_class$LOCATION == "Gambia, The"), 1] <- "Gambia"
+income_class[which(income_class$LOCATION == "Iran, Islamic Rep."), 1] <- "Iran (Islamic Republic of)"
+income_class[which(income_class$LOCATION == "Kyrgyz Republic"), 1] <- "Kyrgyzstan"
+income_class[which(income_class$LOCATION == "Lao PDR"), 1] <- "Lao People's Democratic Republic"
+income_class[which(income_class$LOCATION == "Micronesia, Fed. Sts."), 1] <- "Micronesia (Federated States of)"
+income_class[which(income_class$LOCATION == "Moldova"), 1] <- "Republic of Moldova"
+income_class[which(income_class$LOCATION == "St. Kitts and Nevis"), 1] <- "Saint Kitts and Nevis"
+income_class[which(income_class$LOCATION == "St. Lucia"), 1] <- "Saint Lucia"
+income_class[which(income_class$LOCATION == "St. Vincent and the Grenadines"), 1] <- "Saint Vincent and the Grenadines"
+income_class[which(income_class$LOCATION == "Slovak Republic"), 1] <- "Slovakia"
+income_class[which(income_class$LOCATION == "Taiwan, China"), 1] <- "Taiwan (Province of China)"
+income_class[which(income_class$LOCATION == "Tanzania"), 1] <- "United Republic of Tanzania"
+income_class[which(income_class$LOCATION == "United States"), 1] <- "United States of America"
+income_class[which(income_class$LOCATION == "Virgin Islands (U.S.)"), 1] <- "United States Virgin Islands"
+income_class[which(income_class$LOCATION == "Venezuela, RB"), 1] <- "Venezuela (Bolivarian Republic of)"
+income_class[which(income_class$LOCATION == "Vietnam"), 1] <- "Viet Nam"
+income_class[which(income_class$LOCATION == "Yemen, Rep."), 1] <- "Yemen"
+
+#Countries in IHME database but not in WB income class's
+# "Cook Islands"
+# "Niue"
+# "Palestine"
+# "Sao Tome and Principe"
+# "Tokelau"
+countries <- NULL
+
+
+
+#Adjusting countries names from Countries Coord to merge with IHME
+countries_coord <- data.frame(COORD_COUNTRIES = unique(coord_countries$LOCATION),
+			    COORD_COUNTRIES_2 = unique(coord_countries$LOCATION))
+	
+countries <- merge(countries_ihme, countries_coord, by.x = "IHME", by.y = "COORD_COUNTRIES_2", all = T)
+
+coord_countries[which(coord_countries$LOCATION == "Bolivia"), 1] <- "Bolivia (Plurinational State of)"
+coord_countries[which(coord_countries$LOCATION == "Republic of the Congo"), 1] <- "Congo"
+coord_countries[which(coord_countries$LOCATION == "Czech Republic"), 1] <- "Czechia"
+coord_countries[which(coord_countries$LOCATION == "Republic of Korea"), 1] <- "Democratic People's Republic of Korea"
+coord_countries[which(coord_countries$LOCATION == "eSwatini"), 1] <- "Eswatini"
+coord_countries[which(coord_countries$LOCATION == "The Gambia"), 1] <- "Gambia"
+coord_countries[which(coord_countries$LOCATION == "Iran"), 1] <- "Iran (Islamic Republic of)"
+coord_countries[which(coord_countries$LOCATION == "Lao PDR"), 1] <- "Lao People's Democratic Republic"
+coord_countries[which(coord_countries$LOCATION == "Macedonia"), 1] <- "North Macedonia"
+coord_countries[which(coord_countries$LOCATION == "Moldova"), 1] <- "Republic of Moldova"
+coord_countries[which(coord_countries$LOCATION == "Syria"), 1] <- "Syrian Arab Republic"
+coord_countries[which(coord_countries$LOCATION == "Taiwan"), 1] <- "Taiwan (Province of China)"
+coord_countries[which(coord_countries$LOCATION == "Tanzania"), 1] <- "United Republic of Tanzania"
+coord_countries[which(coord_countries$LOCATION == "United States"), 1] <- "United States of America"
+coord_countries[which(coord_countries$LOCATION == "Venezuela"), 1] <- "Venezuela (Bolivarian Republic of)"
+coord_countries[which(coord_countries$LOCATION == "Vietnam"), 1] <- "Viet Nam"
+
+
+#Countries in IHME database but not in coord coutries's
+# "American Samoa"
+# "Andorra"
+# "Antigua and Barbuda"
+# "Bahrain"
+# "Barbados"
+# "Bermuda"
+# "Cabo Verde"
+# "Comoros"
+# "Cook Islands"
+# "Dominica"
+# "Grenada"
+# "Guam"
+# "Kiribati"
+# "Maldives"
+# "Malta"
+# "Marshall Islands"
+# "Mauritius"
+# "Micronesia (Federated States of)"
+# "Monaco"
+# "Nauru"
+# "Niue"
+# "Northern Mariana Islands"
+# "Palau"
+# "Saint Kitts and Nevis"
+# "Saint Lucia"
+# "Saint Vincent and the Grenadine"
+# "Samoa"
+# "San Marino"
+# "Sao Tome and Principe"
+# "Seychelles"
+# "Tokelau"
+# "Tonga"
+# "Tuvalu"
+# "United States Virgin Islands"
+countries <- NULL
+
+
+#Adjusting the variables from WHO
+who[which(who$Indicators == "Current Health Expenditure (CHE) as % Gross Domestic Product (GDP)"), 2] <- "CHE_PERC_GDP"
+who[which(who$Indicators == "Out-of-pocket (OOPS) as % of Current Health Expenditure (CHE)"), 2] <- "OOP_PERC_CHE"
+who[which(who$Indicators == "External Health Expenditure (EXT) as % of Current Health Expenditure (CHE)"), 2] <- "EHE_PERC_CHE"
+who[which(who$Indicators == "Domestic General Government Health Expenditure (GGHE-D) as % Gross Domestic Product (GDP)"), 2] <- "DGGHE_PERC_GDP"
+who[which(who$Indicators == "General Government Expenditure (GGE) as % Gross Domestic Product (GDP)"), 2] <- "GGE_PERC_GDP"
+who[which(who$Indicators == "Gross Domestic Product"), 2] <- "GDP"
 who <- who[,-3]
 who <- melt(who,id.vars = c("Countries","Indicators"))
 names(who)[3] <- "YEAR" 
 who$value <- as.numeric(gsub("\\,", "", who$value))
 who <- dcast(who, Countries + YEAR ~ Indicators, value.var = "value")
+who$GDP <- who$GDP * 1000000 #converting to U$
+who$CHE <- who$CHE_PERC_GDP*who$GDP/100 #Current Health Expenditure
+who$OOP <- who$OOP_PERC_CHE*who$CHE/100 #Out-of-pocket
+who$EHE <- who$EHE_PERC_CHE*who$CHE/100 #External Health Expenditure
+who$DGGHE <- who$DGGHE_PERC_GDP*who$GDP/100 #Domestic General Government Health Expenditure
+who$GGE <- who$GGE_PERC_GDP*who$GDP/100 #General Government Expenditure
+who <- who %>% dplyr::select("Countries", "YEAR", "GDP", "OOP","EHE","DGGHE","GGE")
+
 who[is.na(who)] <- 0
-who$HEALTH_PPP <- who$EXT_PPP + who$DGGHE_PPP #Domestic and external health expenditure per capita PPP
+who$HEALTH_EXP <- who$DGGHE + who$EHE #Domestic and external health expenditure
+who$EHE <- NULL
+who$DGGHE <- NULL
 names(who)[1] <- "LOCATION" 
-who<- subset(who, who$YEAR %in% c(2012:2017))
-#Adjusting countries names to merge with world bank data
-who[which(who$LOCATION == "Bahamas"), 1] <- "Bahamas, The"
-who[which(who$LOCATION == "Bolivia Plurinational States of"), 1] <- "Bolivia"
-who[which(who$LOCATION == "Cabo Verde Republic of"), 1] <- "Cabo Verde"
-who[which(who$LOCATION == "Congo"), 1] <- "Congo, Rep."
-who[which(who$LOCATION == "Democratic Republic of the Congo"), 1] <- "Congo, Dem. Rep"
-who[which(who$LOCATION == "Egypt"), 1] <- "Egypt, Arab Rep."
-who[which(who$LOCATION == "Gambia"), 1] <- "Gambia, The"
-who[which(who$LOCATION == "Iran"), 1] <- "Iran, Islamic Rep."
-who[which(who$LOCATION == "Kyrgyzstan"), 1] <- "Kyrgyz Republic"
-who[which(who$LOCATION == "Lao People's Democratic Republic"), 1] <- "Lao PDR"
-who[which(who$LOCATION == "Micronesia (Federated States of)"), 1] <- "Micronesia, Fed. Sts."
-who[which(who$LOCATION == "Republic of Korea"), 1] <- "Korea, Rep."
-who[which(who$LOCATION == "Republic of Moldova"), 1] <- "Moldova"
-who[which(who$LOCATION == "Saint Kitts and Nevis"), 1] <- "St. Kitts and Nevis"
-who[which(who$LOCATION == "Saint Lucia"), 1] <- "St. Lucia"
-who[which(who$LOCATION == "Saint Vincent and the Grenadines"), 1] <- "St. Vincent and the Grenadines"
-who[which(who$LOCATION == "Slovakia"), 1] <- "Slovak Republic"
-who[which(who$LOCATION == "Syria"), 1] <- "Syrian Arab Republic"
-who[which(who$LOCATION == "The former Yugoslav Republic of Macedonia"), 1] <- "Macedonia, FYR"
-who[which(who$LOCATION == "United States of America"), 1] <- "United States"
-who[which(who$LOCATION == "United Republic of Tanzania"), 1] <- "Tanzania"
-who[which(who$LOCATION == "Venezuela (Bolivarian Republic of)"), 1] <- "Venezuela, RB"
-who[which(who$LOCATION == "Viet Nam"), 1] <- "Vietnam"
-who[which(who$LOCATION == "Yemen"), 1] <- "Yemen, Rep."
-who[which(who$LOCATION == "Congo, Dem. Rep"), 1] <- "Congo, Dem. Rep."
-who[which(who$LOCATION == "Côte d'Ivoire"), 1] <- "Cote d'Ivoire"
-who[which(who$LOCATION == "Macedonia, FYR"), 1] <- "North Macedonia"
+who <- subset(who, who$YEAR %in% c(2012:2017))
 
 
-#ODA, Deflactor, Tax revenue and external factors
+#ODAand external factors
 ODA <- dplyr::select(ODA, YEAR = date, ODA = value, LOCATION = country)
-deflator <- dplyr::select(deflator, YEAR = date, deflator = value, LOCATION = country)
-TAX <- dplyr::select(TAX, YEAR = date, TAX = value, LOCATION = country)
 GINI <- dplyr::select(GINI, YEAR = date, GINI = value, LOCATION = country)
 POVERTY_GAP <- dplyr::select(POVERTY_GAP, YEAR = date, POVERTY_GAP = value, LOCATION = country)
 INFLATION <- dplyr::select(INFLATION, YEAR = date, INFLATION = value, LOCATION = country)
@@ -348,94 +468,59 @@ all_pop <- all_pop %>%
    group_by(location) %>%
    summarise(pop = mean(val, na.rm = T))
 names(all_pop)[1] <- "LOCATION"
-all_pop[which(all_pop$LOCATION == "Republic of the Congo"), 1] <- "Congo, Rep."
-all_pop[which(all_pop$LOCATION == "Côte d'Ivoire"), 1] <- "Cote d'Ivoire"
-all_pop[which(all_pop$LOCATION == "Egypt"), 1] <- "Egypt, Arab Rep."
-all_pop[which(all_pop$LOCATION == "Republic of Korea"), 1] <- "Korea, Rep."
-all_pop[which(all_pop$LOCATION == "Macedonia"), 1] <- "North Macedonia"
-all_pop[which(all_pop$LOCATION == "Slovakia"), 1] <- "Slovak Republic"
-all_pop[which(all_pop$LOCATION == "Democratic Republic of the Congo"), 1] <- "Congo, Dem. Rep."
-all_pop[which(all_pop$LOCATION == "The Gambia"), 1] <- "Gambia, The"
-all_pop[which(all_pop$LOCATION == "Dominican Republic"), 1] <- "Dominica"
-all_pop[which(all_pop$LOCATION == "Iran"), 1] <- "Iran, Islamic Rep."
-all_pop[which(all_pop$LOCATION == "Kyrgyzstan"), 1] <- "Kyrgyz Republic"
-all_pop[which(all_pop$LOCATION == "Dem. Rep. Korea"), 1] <- "North Korea"
-all_pop[which(all_pop$LOCATION == "Bahamas"), 1] <- "Bahamas, The"
-all_pop[which(all_pop$LOCATION == "Yemen"), 1] <- "Yemen, Rep."
-all_pop[which(all_pop$LOCATION == "The Bahamas"), 1] <- "Bahamas, The"
-all_pop[which(all_pop$LOCATION == "North Korea"), 1] <- "Korea, Dem. People’s Rep."
-all_pop[which(all_pop$LOCATION == "South Korea"), 1] <- "Korea, Rep."
-all_pop[which(all_pop$LOCATION == "Laos"), 1] <- "Lao PDR"
-all_pop[which(all_pop$LOCATION == "Macedonia, FYR"), 1] <- "North Macedonia"
-all_pop[which(all_pop$LOCATION == "Federated States of Micronesia"), 1] <- "Micronesia, Fed. Sts."
-all_pop[which(all_pop$LOCATION == "Venezuela"), 1] <- "Venezuela, RB"
-all_pop[which(all_pop$LOCATION == "Congo"), 1] <- "Congo, Rep."
-all_pop[which(all_pop$LOCATION == "Brunei"), 1] <- "Brunei Darussalam"
 
 wb1 <- merge(wb1, all_pop, by = "LOCATION", all.x = T)
 
 wb1$POP_DENS <- wb1$pop/wb1$SURFACE #Populational density
 wb2 <- Reduce(function(x, y) merge(x, y, by = c("LOCATION", "YEAR"),  all=TRUE), 
-      list(ODA, deflator, TAX))
+      list(ODA))
 
 
 #Merging World Bank database with WHO database
 who <- merge(who, wb2, by = c("LOCATION", "YEAR"), all.x = T) #https://www.khanacademy.org/economics-finance-domain/macroeconomics/macro-economic-indicators-and-the-business-cycle/macro-real-vs-nominal-gdp/a/lesson-summary-real-vs-nominal-gdp
 #Calculating Public Expenditure and Proportion of Public Health Expenditure
-who[which(is.na(who$ODA)), 9] <- 0 #Changing NA for 0 in ODA colum, to sum with Government general expenditure
-who$PUBLIC_EXP <- who$GGE_PPP + who$ODA
-
-#Passing monetarie value to constant 2017 PPP int$
-who_deflac <- dplyr::select(who, LOCATION, YEAR, deflator, GDP_PPP, TAX, PUBLIC_EXP, HEALTH_PPP, OOP_PPP)
-who_deflac[which(is.na(who_deflac$TAX)), 5] <- 0 #Changing NA for 0 in TAX colum, to calculate constant 2017 value
-who_deflac$TAX_PPP <- who_deflac$TAX * who_deflac$GDP_PPP/10
-who_deflac$TAX <- NULL
-who_deflac <- na.omit(who_deflac) #excluding lines whith deflactor == NA
-who_deflac$deflator <- who_deflac$deflator/100 #Transformando em centésimo
-
-
-who_deflac <- who_deflac %>%
-   group_by(LOCATION) %>%
-   nest()
-for(i in seq_along(who_deflac$LOCATION)){
-   who_deflac$data[[i]][2] <- who_deflac$data[[i]][which(who_deflac$data[[i]][1] == 2017),2] #Para setar um ano como constante
-   who_deflac$data[[i]][3] <- who_deflac$data[[i]][3]/who_deflac$data[[i]][2]
-   who_deflac$data[[i]][4] <- who_deflac$data[[i]][4]/who_deflac$data[[i]][2]
-   who_deflac$data[[i]][5] <- who_deflac$data[[i]][5]/who_deflac$data[[i]][2]
-   who_deflac$data[[i]][6] <- who_deflac$data[[i]][6]/who_deflac$data[[i]][2]
-   who_deflac$data[[i]][7] <- who_deflac$data[[i]][7]/who_deflac$data[[i]][2]
-}
-who <- unnest(who_deflac)
-
-who <- dplyr::select(who, LOCATION, YEAR, GDP_PPP, PUBLIC_EXP, HEALTH_PPP, OOP_PPP, TAX_PPP)
+who[which(is.na(who$ODA)), names(who)== "ODA"] <- 0 #Changing NA for 0 in ODA colum, to sum with Government general expenditure
+who$ODA <- who$ODA * who$GDP #multipling to obtein a monetary value
+who[who$ODA < 0, names(who) == "ODA"] <- 0 #Excluding negative values
+who$PUBLIC_EXP <- who$GGE + who$ODA #Internal and external resources for public expenditure
+who <- dplyr::select(who, LOCATION, YEAR, GDP, PUBLIC_EXP, HEALTH_EXP, OOP)
 #Excluding countries without information
 who <- na.omit(who)
-who <- subset(who, who$GDP_PPP != 0)
+who <- subset(who, who$GDP != 0)
 who <- subset(who, who$PUBLIC_EXP != 0)
-who <- subset(who, who$HEALTH_PPP != 0)
-who <- subset(who, who$TAX_PPP != 0)
+who <- subset(who, who$HEALTH_EXP != 0)
+all_pop2 <- subset(population, population$age == "All Ages")
+all_pop2$age <- NULL
+names(all_pop2) <- c("LOCATION", "YEAR", "POP")
+who <- merge(who, all_pop2, by = c("LOCATION", "YEAR"))
+who$POP <- as.numeric(who$POP)
+who$GDP_PER_CAP <- who$GDP/who$POP #per capita
+who$PUBLIC_EXP_PER_CAP <- who$PUBLIC_EXP/who$POP # per capita
+who$HEALTH_EXP_PER_CAP <- who$HEALTH_EXP/who$POP # per capita
+who$OOP_PER_CAP <- who$OOP/who$POP # per capita
+
 
 #Estimanting lagged 
 who_lagged1 <- subset(who, who$YEAR %in% c(2017))
 who_lagged1 <- who_lagged1 %>% 
    group_by(LOCATION) %>%
-   summarize(GDP_PPP_LAGGED1 = GDP_PPP)
+   summarize(GDP_PER_CAP_LAGGED1 = GDP_PER_CAP)
 
 
 #Calculating Proportion of Public Health Expenditure
 who_lagged2 <- subset(who, who$YEAR %in% c(2015:2016))
-who_lagged2$PROP_PUBLIC_HEALTH_EXP <- who_lagged2$HEALTH_PPP/who_lagged2$PUBLIC_EXP
+who_lagged2$PROP_PUBLIC_HEALTH_EXP <- who_lagged2$HEALTH_EXP_PER_CAP/who_lagged2$PUBLIC_EXP_PER_CAP
 who_lagged2 <- who_lagged2 %>%
    group_by(LOCATION) %>%
-   summarize(TAX_PPP_LAGGED2 = mean(TAX_PPP, na.rm = T),
-      PUBLIC_EXP_LAGGED2 = mean(PUBLIC_EXP, na.rm = T),
+   summarize(
+      PUBLIC_EXP_PER_CAP_LAGGED2 = mean(PUBLIC_EXP_PER_CAP, na.rm = T),
       PROP_PUBLIC_HEALTH_EXP_LAGGED2 = mean(PROP_PUBLIC_HEALTH_EXP, na.rm = T))
 
 
 who_lagged3 <- subset(who, who$YEAR %in% c(2012:2014))
 who_lagged3 <- who_lagged3 %>% 
    group_by(LOCATION) %>%
-   summarize(OOP_PPP_LAGGED3 = mean(OOP_PPP, na.rm = T))
+   summarize(OOP_PER_CAP_LAGGED3 = mean(OOP_PER_CAP, na.rm = T))
 
 
 who <- merge(who_lagged1, who_lagged2, by = "LOCATION")
@@ -443,44 +528,8 @@ who <- merge(who, who_lagged3, by = "LOCATION")
 
 
 #Income class
-income_class <- income_class[,c(1,31)] #LOCATION and 2016
+income_class <- income_class[,c(1,34)] #LOCATION and 2019
 names(income_class)[2] <- "INCOME_CLASS"
-income_class[which(income_class$LOCATION == "Côte d'Ivoire"), 1] <- "Cote d'Ivoire"
-income_class[which(income_class$LOCATION == "São Tomé and Principe"), 1] <- "Sao Tome and Principe"
-income_class[which(income_class$LOCATION == "Korea, Dem. Rep."), 1] <- "Korea, Dem. People’s Rep."
-income_class[which(income_class$LOCATION == "Faeroe Islands"), 1] <- "Faroe Islands"
-income_class[which(income_class$LOCATION == "Curaçao"), 1] <- "Curacao"
-
-
-#Geografical centroid
-coord_countries <- world
-xy <- st_coordinates(st_centroid(coord_countries))
-coord_countries <- cbind(coord_countries, xy)
-coord_countries <- dplyr::select(coord_countries, name_long,X,Y)
-coord_countries$geom <- NULL
-names(coord_countries)[1] <- "LOCATION"
-coord_countries[which(coord_countries$LOCATION == "Republic of the Congo"), 1] <- "Congo, Rep."
-coord_countries[which(coord_countries$LOCATION == "Côte d'Ivoire"), 1] <- "Cote d'Ivoire"
-coord_countries[which(coord_countries$LOCATION == "Egypt"), 1] <- "Egypt, Arab Rep."
-coord_countries[which(coord_countries$LOCATION == "Republic of Korea"), 1] <- "Korea, Rep."
-coord_countries[which(coord_countries$LOCATION == "Macedonia"), 1] <- "North Macedonia"
-coord_countries[which(coord_countries$LOCATION == "Slovakia"), 1] <- "Slovak Republic"
-coord_countries[which(coord_countries$LOCATION == "Democratic Republic of the Congo"), 1] <- "Congo, Dem. Rep."
-coord_countries[which(coord_countries$LOCATION == "The Gambia"), 1] <- "Gambia, The"
-coord_countries[which(coord_countries$LOCATION == "Dominican Republic"), 1] <- "Dominica"
-coord_countries[which(coord_countries$LOCATION == "Iran"), 1] <- "Iran, Islamic Rep."
-coord_countries[which(coord_countries$LOCATION == "Kyrgyzstan"), 1] <- "Kyrgyz Republic"
-coord_countries[which(coord_countries$LOCATION == "Dem. Rep. Korea"), 1] <- "North Korea"
-coord_countries[which(coord_countries$LOCATION == "Bahamas"), 1] <- "Bahamas, The"
-coord_countries[which(coord_countries$LOCATION == "Yemen"), 1] <- "Yemen, Rep."
-
-
-base[which(base$LOCATION == "Democratic Republic of the Congo"), 1] <- "Congo, Dem. Rep."
-base[which(base$LOCATION == "Brunei"), 1] <- "Brunei Darussalam"
-base[which(base$LOCATION == "The Gambia"), 1] <- "Gambia, The"
-base[which(base$LOCATION == "Iran"), 1] <- "Iran, Islamic Rep."
-base[which(base$LOCATION == "Laos"), 1] <- "Lao PDR"
-base[which(base$LOCATION == "Yemen"), 1] <- "Yemen, Rep."
 
 
 #Mergin all the indicators
