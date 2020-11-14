@@ -127,17 +127,6 @@ URBAN_RATE <- wb(indicator = "SP.URB.TOTL.IN.ZS", startdate = 2012, enddate = 20
 SURFACE <- wb(indicator = "AG.SRF.TOTL.K2", startdate = 2012, enddate = 2014)
 
 
-#Economic development data
-#https://datahelpdesk.worldbank.org/knowledgebase/articles/378834-how-does-the-world-bank-classify-countries
-#http://databank.worldbank.org/data/download/site-content/OGHIST.xls
-# 2019
-# Low income (L) <= 1,035
-# Lower middle income (LM) 1,036 - 4,045
-# Upper middle income (UM) 4,046 - 12,535
-# High income (H) > 12,535
-income_class <- read_csv("bases/WB/income_class_serie.csv")
-
-
 #Geografical centroid
 coord_countries <- world
 xy <- st_coordinates(st_centroid(coord_countries))
@@ -258,47 +247,6 @@ who[which(who$Countries == "Syria"), 1] <- "Syrian Arab Republic"
 # "Tokelau"
 # "United States Virgin Islands"
 countries <- NULL
-
-
-
-#Adjusting countries names from WB INCOME CLASS to merge with IHME
-countries_icome_class <- data.frame(WB_INCOME_CLASS = unique(income_class$LOCATION),
-			    WB_INCOME_CLASS_2 = unique(income_class$LOCATION))
-countries <- merge(countries_ihme, countries_icome_class, by.x = "IHME", by.y = "WB_INCOME_CLASS_2", all = T)
-
-income_class[which(income_class$LOCATION == "Bahamas, The"), 1] <- "Bahamas"
-income_class[which(income_class$LOCATION == "Bolivia"), 1] <- "Bolivia (Plurinational State of)"
-income_class[which(income_class$LOCATION == "Congo, Rep."), 1] <- "Congo"
-income_class[which(income_class$LOCATION == "Czech Republic"), 1] <- "Czechia"
-income_class[which(income_class$LOCATION == "Korea, Dem. Rep."), 1] <- "Democratic People's Republic of Korea"
-income_class[which(income_class$LOCATION == "Congo, Dem. Rep"), 1] <- "Democratic Republic of the Congo"
-income_class[which(income_class$LOCATION == "Egypt, Arab Rep."), 1] <- "Egypt"
-income_class[which(income_class$LOCATION == "Gambia, The"), 1] <- "Gambia"
-income_class[which(income_class$LOCATION == "Iran, Islamic Rep."), 1] <- "Iran (Islamic Republic of)"
-income_class[which(income_class$LOCATION == "Kyrgyz Republic"), 1] <- "Kyrgyzstan"
-income_class[which(income_class$LOCATION == "Lao PDR"), 1] <- "Lao People's Democratic Republic"
-income_class[which(income_class$LOCATION == "Micronesia, Fed. Sts."), 1] <- "Micronesia (Federated States of)"
-income_class[which(income_class$LOCATION == "Moldova"), 1] <- "Republic of Moldova"
-income_class[which(income_class$LOCATION == "St. Kitts and Nevis"), 1] <- "Saint Kitts and Nevis"
-income_class[which(income_class$LOCATION == "St. Lucia"), 1] <- "Saint Lucia"
-income_class[which(income_class$LOCATION == "St. Vincent and the Grenadines"), 1] <- "Saint Vincent and the Grenadines"
-income_class[which(income_class$LOCATION == "Slovak Republic"), 1] <- "Slovakia"
-income_class[which(income_class$LOCATION == "Taiwan, China"), 1] <- "Taiwan (Province of China)"
-income_class[which(income_class$LOCATION == "Tanzania"), 1] <- "United Republic of Tanzania"
-income_class[which(income_class$LOCATION == "United States"), 1] <- "United States of America"
-income_class[which(income_class$LOCATION == "Virgin Islands (U.S.)"), 1] <- "United States Virgin Islands"
-income_class[which(income_class$LOCATION == "Venezuela, RB"), 1] <- "Venezuela (Bolivarian Republic of)"
-income_class[which(income_class$LOCATION == "Vietnam"), 1] <- "Viet Nam"
-income_class[which(income_class$LOCATION == "Yemen, Rep."), 1] <- "Yemen"
-
-#Countries in IHME database but not in WB income class's
-# "Cook Islands"
-# "Niue"
-# "Palestine"
-# "Sao Tome and Principe"
-# "Tokelau"
-countries <- NULL
-
 
 
 #Adjusting countries names from Countries Coord to merge with IHME
@@ -478,7 +426,7 @@ wb2 <- Reduce(function(x, y) merge(x, y, by = c("LOCATION", "YEAR"),  all=TRUE),
 
 #Merging World Bank database with WHO database
 who <- merge(who, wb2, by = c("LOCATION", "YEAR"), all.x = T) #https://www.khanacademy.org/economics-finance-domain/macroeconomics/macro-economic-indicators-and-the-business-cycle/macro-real-vs-nominal-gdp/a/lesson-summary-real-vs-nominal-gdp
-#Calculating Public Expenditure and Proportion of Public Health Expenditure
+#Calculating Public Expenditure and Public Health Expenditure
 who[which(is.na(who$ODA)), names(who)== "ODA"] <- 0 #Changing NA for 0 in ODA colum, to sum with Government general expenditure
 who$ODA <- who$ODA * who$GDP #multipling to obtein a monetary value
 who[who$ODA < 0, names(who) == "ODA"] <- 0 #Excluding negative values
@@ -509,12 +457,11 @@ who_lagged1 <- who_lagged1 %>%
 
 #Calculating Proportion of Public Health Expenditure
 who_lagged2 <- subset(who, who$YEAR %in% c(2015:2016))
-who_lagged2$PROP_PUBLIC_HEALTH_EXP <- who_lagged2$HEALTH_EXP_PER_CAP/who_lagged2$PUBLIC_EXP_PER_CAP
 who_lagged2 <- who_lagged2 %>%
    group_by(LOCATION) %>%
    summarize(
       PUBLIC_EXP_PER_CAP_LAGGED2 = mean(PUBLIC_EXP_PER_CAP, na.rm = T),
-      PROP_PUBLIC_HEALTH_EXP_LAGGED2 = mean(PROP_PUBLIC_HEALTH_EXP, na.rm = T))
+      HEALTH_EXP_LAGGED2 = mean(HEALTH_EXP_PER_CAP, na.rm = T))
 
 
 who_lagged3 <- subset(who, who$YEAR %in% c(2012:2014))
@@ -527,31 +474,31 @@ who <- merge(who_lagged1, who_lagged2, by = "LOCATION")
 who <- merge(who, who_lagged3, by = "LOCATION")
 
 
-#Income class
-income_class <- income_class[,c(1,34)] #LOCATION and 2019
-names(income_class)[2] <- "INCOME_CLASS"
-
-
 #Mergin all the indicators
 base <- merge(base, who, by = "LOCATION", all.y = T)
 base <- merge(base, wb1, by = "LOCATION", all.x = T)
-base <- merge(base, income_class, by = "LOCATION", all.x = T)
 base <- merge(base, coord_countries, by = "LOCATION", all.x = T)
-#Excludina countries without mortality and centroid data
+#Excluding countries without mortality and centroid data
 base <- base[which(!is.na(base$MEAN_RATE_NEO)), ]
 base <- base[which(!is.na(base$X)), ]
 names(base)[which(names(base) == "X")] <- "LONG" 
 names(base)[which(names(base) == "Y")] <- "LAT" 
+#Excluding coutries without population
+base <- subset(base, !is.na(base$pop))
+
+#Calculating expenditure with other sectors than health
+base$OTHER_EXP_LAGGED2 <- base$PUBLIC_EXP_PER_CAP_LAGGED2 - base$HEALTH_EXP_LAGGED2
+
 
 #########################################################################
 #Imputation
 #########################################################################
-base_matrix <- as.matrix(dplyr::select(base, -LOCATION, -INCOME_CLASS))
-missing <- md.pattern(base_matrix)
-temp_base <- mice::mice(base_matrix, m=10, maxit=100, meth='cart', seed=233)
+base_matrix <- as.matrix(dplyr::select(base, -LOCATION))
+missing <- md.pattern(base_matrix,plot = T)
+temp_base <- mice::mice(base_matrix, m=10, maxit=10, meth='cart', seed=233)
 #summary(temp_base)
 completed_base <- mice::complete(temp_base,1)
-completed_base <- cbind(dplyr::select(base, LOCATION, INCOME_CLASS), completed_base) %>% as.data.frame()
+completed_base <- cbind(dplyr::select(base, LOCATION), completed_base) %>% as.data.frame()
 densityplot(temp_base)
 
 
