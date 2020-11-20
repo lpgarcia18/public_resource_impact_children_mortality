@@ -42,7 +42,7 @@ fertility <- read_csv("bases/IHME/IHME_GBD_2019_FERTILITY_1950_2019_TFR/IHME_GBD
 #External Health Expenditure (EXT) as % of Current Health Expenditure (CHE)
 #Domestic General Government Health Expenditure (GGHE-D) as % Gross Domestic Product (GDP)
 #General Government Expenditure (GGE) as % Gross Domestic Product (GDP)
-#Gross Domestic Product
+#Gross Domestic Product (GDP) per Capita in PPP Int$
 
 #Relation
 #in million constant (2017) US$
@@ -52,79 +52,79 @@ who <- read_csv("bases/WHO/EXP_WHO.csv")
 new_cache <- wbcache()
 #wbsearch(pattern = "Strength of legal rights index")
 
-#OUTCOME
+#TREATMENT
 #Net ODA received (% of GDP)
-ODA <- wb(indicator = "DT.ODA.ODAT.GN.ZS", startdate = 2012, enddate = 2019)
+ODA <- wb(indicator = "DT.ODA.ODAT.GN.ZS", startdate = 2013, enddate = 2017)
 
 #ECONOMIC/INCOME
 #GINI index (World Bank estimate)
-GINI <- wb(indicator = "SI.DST.10TH.10", startdate = 2012, enddate = 2014)
+GINI <- wb(indicator = "SI.DST.10TH.10", startdate = 2010, enddate = 2012)
 #Poverty gap at $1.90 a day (2011 PPP) (%)
-POVERTY_GAP <- wb(indicator = "SI.POV.GAPS", startdate = 2012, enddate = 2014)
+POVERTY_GAP <- wb(indicator = "SI.POV.GAPS", startdate = 2010, enddate = 2012)
 #Inflation, consumer prices (annual %)
-INFLATION <- wb(indicator = "FP.CPI.TOTL.ZG", startdate = 2012, enddate = 2014)
+INFLATION <- wb(indicator = "FP.CPI.TOTL.ZG", startdate = 2010, enddate = 2012)
 #Unemployment, total (% of total labor force) (modeled ILO estimate)
-UNEMPLOYMENT <- wb(indicator = "SL.UEM.TOTL.ZS", startdate = 2012, enddate = 2014)
+UNEMPLOYMENT <- wb(indicator = "SL.UEM.TOTL.ZS", startdate = 2010, enddate = 2012)
 
 #SANITATION
 #People using basic sanitation services (% of population)
-BASIC_SANITATION <- wb(indicator = "SH.STA.BASS.ZS", startdate = 2012, enddate = 2014)
+BASIC_SANITATION <- wb(indicator = "SH.STA.BASS.ZS", startdate = 2010, enddate = 2012)
 #People using basic drinking water services (% of population)
-BASIC_WATER <- wb(indicator = "SH.H2O.BASW.ZS", startdate = 2012, enddate = 2014)
+BASIC_WATER <- wb(indicator = "SH.H2O.BASW.ZS", startdate = 2010, enddate = 2012)
 
 #FEMALE EMPOWERMENT
 #Unemployment, female (% of female labor force) (modeled ILO estimate)
-UNEMPLOYMENT_FEM <- wb(indicator = "SL.UEM.TOTL.FE.ZS", startdate = 2012, enddate = 2014)
+UNEMPLOYMENT_FEM <- wb(indicator = "SL.UEM.TOTL.FE.ZS", startdate = 2010, enddate = 2012)
 #School life expectancy, secondary, female (years)
-SCHOOL_FEM <- wb(indicator = "UIS.SLE.23.F", startdate = 2012, enddate = 2014)
+SCHOOL_FEM <- wb(indicator = "UIS.SLE.23.F", startdate = 2010, enddate = 2012)
 #Proportion of seats held by women in national parliaments (%)
-WOMEN_PARLIAMENT <- wb(indicator = "SG.GEN.PARL.ZS", startdate = 2012, enddate = 2014)
+WOMEN_PARLIAMENT <- wb(indicator = "SG.GEN.PARL.ZS", startdate = 2010, enddate = 2012)
 
 #SCHOOL
 #School life expectancy, secondary, both sexes (years)
-SCHOOL_LIFE_EXP <- wb(indicator = "UIS.SLE.23", startdate = 2012, enddate = 2014)
+SCHOOL_LIFE_EXP <- wb(indicator = "UIS.SLE.23", startdate = 2010, enddate = 2012)
 #Rate of out-of-school adolescents of lower secondary school age, both sexes (%)
-OUT_OF_SCHOOL <- wb(indicator = "UIS.ROFST.2", startdate = 2012, enddate = 2014)
+OUT_OF_SCHOOL <- wb(indicator = "UIS.ROFST.2", startdate = 2010, enddate = 2012)
 
 #GOVERNANCE
 #Control of Corruption: Estimate	
-CONTROL_CORRUPTION <- wb(indicator = "CC.EST", startdate = 2012, enddate = 2014)
+CONTROL_CORRUPTION <- wb(indicator = "CC.EST", startdate = 2010, enddate = 2012)
 #Government Effectiveness: Estimate	
-GOV_EFFECTIVENESS <- wb(indicator = "GE.EST", startdate = 2012, enddate = 2014)
+GOV_EFFECTIVENESS <- wb(indicator = "GE.EST", startdate = 2010, enddate = 2012)
 #Political Stability and Absence of Violence/Terrorism: Estimate	
-POLITICAL_STABILITY <- wb(indicator = "PV.EST", startdate = 2012, enddate = 2014)
+POLITICAL_STABILITY <- wb(indicator = "PV.EST", startdate = 2010, enddate = 2012)
 #Regulatory Quality: Estimate	
-REGULATORY_QUALITY <- wb(indicator = "RQ.EST", startdate = 2012, enddate = 2014)
+REGULATORY_QUALITY <- wb(indicator = "RQ.EST", startdate = 2010, enddate = 2012)
 #Rule of Law: Estimate	
-RULE_OF_LAW <- wb(indicator = "RL.EST", startdate = 2012, enddate = 2014)
+RULE_OF_LAW <- wb(indicator = "RL.EST", startdate = 2010, enddate = 2012)
 
 #NUTRITION
 #Prevalence Of Undernourishment (% Of Population)
-UNDERNOURISHMENT <- wb(indicator = "SN.ITK.DEFC.ZS", startdate = 2012, enddate = 2014)
+UNDERNOURISHMENT <- wb(indicator = "SN.ITK.DEFC.ZS", startdate = 2010, enddate = 2012)
 
 #HEALTH
 #Physicians (per 1,000 people)
-DOCTORS <- wb(indicator = "SH.MED.PHYS.ZS", startdate = 2012, enddate = 2014)
+DOCTORS <- wb(indicator = "SH.MED.PHYS.ZS", startdate = 2010, enddate = 2012)
 #Births attended by skilled health staff (% of total)	
-DELIVERY_ASSISTANCE <- wb(indicator = "SH.STA.BRTC.ZS", startdate = 2012, enddate = 2014)
+DELIVERY_ASSISTANCE <- wb(indicator = "SH.STA.BRTC.ZS", startdate = 2010, enddate = 2012)
 #Prevalence of HIV, total (% of population ages 15-49)
-AIDS_PREVALENCE <- wb(indicator = "SH.DYN.AIDS.ZS", startdate = 2012, enddate = 2014)
+AIDS_PREVALENCE <- wb(indicator = "SH.DYN.AIDS.ZS", startdate = 2010, enddate = 2012)
 #Incidence of malaria (per 1,000 population at risk)	
-MALARIA_INCIDENCE <- wb(indicator = "SH.MLR.INCD.P3", startdate = 2012, enddate = 2014)
+MALARIA_INCIDENCE <- wb(indicator = "SH.MLR.INCD.P3", startdate = 2010, enddate = 2012)
 #Immunization, DPT (% of children ages 12-23 months)
-DPT <- wb(indicator = "SH.IMM.IDPT", startdate = 2012, enddate = 2014)
+DPT <- wb(indicator = "SH.IMM.IDPT", startdate = 2010, enddate = 2012)
 #Hospital beds (per 1,000 people)
-HOSPITAL_BEDS <- wb(indicator = "SH.MED.BEDS.ZS", startdate = 2012, enddate = 2014)
+HOSPITAL_BEDS <- wb(indicator = "SH.MED.BEDS.ZS", startdate = 2010, enddate = 2012)
 
 #ENGERGY
 #Access to electricity (% of total population)
-ELECTRICITY <- wb(indicator = "1.1_ACCESS.ELECTRICITY.TOT", startdate = 2012, enddate = 2014)
+ELECTRICITY <- wb(indicator = "1.1_ACCESS.ELECTRICITY.TOT", startdate = 2010, enddate = 2012)
 
 #DEMOGRAPHY
 #Urban population (% of total)
-URBAN_RATE <- wb(indicator = "SP.URB.TOTL.IN.ZS", startdate = 2012, enddate = 2014)
+URBAN_RATE <- wb(indicator = "SP.URB.TOTL.IN.ZS", startdate = 2010, enddate = 2012)
 #Surface area (sq. km)
-SURFACE <- wb(indicator = "AG.SRF.TOTL.K2", startdate = 2012, enddate = 2014)
+SURFACE <- wb(indicator = "AG.SRF.TOTL.K2", startdate = 2010, enddate = 2012)
 
 
 #Geografical centroid
@@ -139,7 +139,7 @@ names(coord_countries)[1] <- "LOCATION"
 #Variable construction
 #########################################################################
 #Mortality rates
-population <- subset(population, population$year_id %in% c(2012:2019))
+population <- subset(population, population$year_id %in% c(2010:2019))
 population <- subset(population, population$location_id != "533")#Excluding Georigia-US
 population <- dplyr::select(population, c('location_name','sex_name','age_group_name', 'year_id', 'val'))
 population <- subset(population,population$sex_name == "both")
@@ -185,13 +185,13 @@ fertility$Total <- as.numeric(fertility$val)
 fertility$val <- NULL
 names(fertility) <- c('YEAR', 'LOCATION', 'FERTILITY_RATE')
 
-fertility <- subset(fertility, fertility$YEAR %in% c(2012:2019))
+fertility <- subset(fertility, fertility$YEAR %in% c(2010:2012))
 fertility <- fertility %>%
    group_by(LOCATION) %>%
    summarize(FERTILITY_RATE_LAGGED = mean(FERTILITY_RATE, na.rm = T))
 #65 years old + 
 population_65 <- subset(population,population$age %in% c("65 to 69", "70+ years", "All Ages"))
-population_65 <- subset(population_65, population_65$year %in% c(2012:2014))
+population_65 <- subset(population_65, population_65$year %in% c(2010:2012))
 population_65$val <- as.numeric(population_65$val)
 population_65 <- dcast(population_65, location  ~ age, value.var = "val", fun.aggregate = mean)
 population_65$PLUS_65_YEARS_LAGGED <- (population_65$`65 to 69` + population_65$`70+ years`)/population_65$`All Ages`
@@ -317,7 +317,7 @@ who[which(who$Indicators == "Out-of-pocket (OOPS) as % of Current Health Expendi
 who[which(who$Indicators == "External Health Expenditure (EXT) as % of Current Health Expenditure (CHE)"), 2] <- "EHE_PERC_CHE"
 who[which(who$Indicators == "Domestic General Government Health Expenditure (GGHE-D) as % Gross Domestic Product (GDP)"), 2] <- "DGGHE_PERC_GDP"
 who[which(who$Indicators == "General Government Expenditure (GGE) as % Gross Domestic Product (GDP)"), 2] <- "GGE_PERC_GDP"
-who[which(who$Indicators == "Gross Domestic Product"), 2] <- "GDP"
+who[which(who$Indicators == "Gross Domestic Product (GDP) per Capita in PPP Int$"), 2] <- "GDP"
 who <- who[,-3]
 who <- melt(who,id.vars = c("Countries","Indicators"))
 names(who)[3] <- "YEAR" 
@@ -336,10 +336,10 @@ who$HEALTH_EXP <- who$DGGHE + who$EHE #Domestic and external health expenditure
 who$EHE <- NULL
 who$DGGHE <- NULL
 names(who)[1] <- "LOCATION" 
-who <- subset(who, who$YEAR %in% c(2012:2017))
+who <- subset(who, who$YEAR %in% c(2010:2017)) #Public expenditure and GDP
 
 
-#ODAand external factors
+#ODA and external factors
 ODA <- dplyr::select(ODA, YEAR = date, ODA = value, LOCATION = country)
 GINI <- dplyr::select(GINI, YEAR = date, GINI = value, LOCATION = country)
 POVERTY_GAP <- dplyr::select(POVERTY_GAP, YEAR = date, POVERTY_GAP = value, LOCATION = country)
@@ -410,7 +410,7 @@ wb1 <- wb1 %>%
       )
 
 all_pop <- subset(population, population$age == "All Ages")
-all_pop <- subset(all_pop, all_pop$year %in% c(2012:2014))
+all_pop <- subset(all_pop, all_pop$year %in% c(2010:2012))
 all_pop$val <- as.numeric(all_pop$val)
 all_pop <- all_pop %>%
    group_by(location) %>%
@@ -449,29 +449,25 @@ who$OOP_PER_CAP <- who$OOP/who$POP # per capita
 
 
 #Estimanting lagged 
-who_lagged1 <- subset(who, who$YEAR %in% c(2017))
-who_lagged1 <- who_lagged1 %>% 
-   group_by(LOCATION) %>%
-   summarize(GDP_PER_CAP_LAGGED1 = GDP_PER_CAP)
-
-
-#Calculating Proportion of Public Health Expenditure
-who_lagged2 <- subset(who, who$YEAR %in% c(2015:2016))
-who_lagged2 <- who_lagged2 %>%
+# Averages
+who_lagged1 <- subset(who, who$YEAR %in% c(2013:2017))
+who_lagged1 <- who_lagged1 %>%
    group_by(LOCATION) %>%
    summarize(
-      PUBLIC_EXP_PER_CAP_LAGGED2 = mean(PUBLIC_EXP_PER_CAP, na.rm = T),
-      HEALTH_EXP_LAGGED2 = mean(HEALTH_EXP_PER_CAP, na.rm = T))
+      PUBLIC_EXP_PER_CAP_LAGGED = mean(PUBLIC_EXP_PER_CAP, na.rm = T),
+      HEALTH_EXP_LAGGED = mean(HEALTH_EXP_PER_CAP, na.rm = T))
 
 
-who_lagged3 <- subset(who, who$YEAR %in% c(2012:2014))
-who_lagged3 <- who_lagged3 %>% 
+who_lagged2 <- subset(who, who$YEAR %in% c(2010:2012))
+who_lagged2 <- who_lagged2 %>% 
    group_by(LOCATION) %>%
-   summarize(OOP_PER_CAP_LAGGED3 = mean(OOP_PER_CAP, na.rm = T))
+   summarize(
+   	GDP_PER_CAP_LAGGED = mean(GDP_PER_CAP, na.rm = T),
+   	OOP_PER_CAP_LAGGED = mean(OOP_PER_CAP, na.rm = T))
+
 
 
 who <- merge(who_lagged1, who_lagged2, by = "LOCATION")
-who <- merge(who, who_lagged3, by = "LOCATION")
 
 
 #Mergin all the indicators
@@ -487,7 +483,9 @@ names(base)[which(names(base) == "Y")] <- "LAT"
 base <- subset(base, !is.na(base$pop))
 
 #Calculating expenditure with other sectors than health
-base$OTHER_EXP_LAGGED2 <- base$PUBLIC_EXP_PER_CAP_LAGGED2 - base$HEALTH_EXP_LAGGED2
+base$OTHER_EXP_LAGGED <- base$PUBLIC_EXP_PER_CAP_LAGGED - base$HEALTH_EXP_LAGGED
+
+base <- subset(base, base$pop > 1000000)
 
 
 #########################################################################
@@ -507,5 +505,6 @@ densityplot(temp_base)
 #########################################################################
 write.csv(base, "bases/missing_base.csv", row.names = F)
 write.csv(completed_base, "bases/completed_base.csv", row.names = F)
+
 
 

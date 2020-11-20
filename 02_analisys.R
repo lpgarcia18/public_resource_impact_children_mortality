@@ -8,9 +8,6 @@ set.seed(1)
 library(readr)
 library(tidyverse)
 library(lubridate)
-library(MatchIt)
-#devtools::install_github('IQSS/Zelig')
-library(Zelig)
 library(WeightIt)
 library(cobalt)
 library(SuperLearner)
@@ -26,6 +23,12 @@ exclude <- c("MEAN_RATE_NEO", "MEAN_RATE_NEO_U5", "PUBLIC_EXP_PER_CAP_LAGGED", "
 
 
 
+# Transformation of monetary variables ------------------------------------
+dose_resp$PUBLIC_EXP_PER_CAP_LAGGED <- log(dose_resp$PUBLIC_EXP_PER_CAP_LAGGED)
+dose_resp$HEALTH_EXP_LAGGED <- log(dose_resp$HEALTH_EXP_LAGGED)
+dose_resp$OTHER_EXP_LAGGED <- log(dose_resp$OTHER_EXP_LAGGED)
+dose_resp$GDP_PER_CAP_LAGGED <- log(dose_resp$GDP_PER_CAP_LAGGED)
+dose_resp$OOP_PER_CAP_LAGGED <- log(dose_resp$OOP_PER_CAP_LAGGED)
 
 
 # Bivariate analysis for match -----------------------
@@ -75,9 +78,13 @@ m.out_public <- weightit(formula = as.formula(p_cor_public),
 					       "SL.xgboost"
 					       ))
 summary(m.out_public)
-bal.tab(m.out_public, un = TRUE, disp.v.ratio = TRUE, m.threshold = .05,continuous = "std")
+bal.tab(m.out_public, un = TRUE, m.threshold = .05)
+m.out_public_trim <- trim(m.out_public, at = .9, lower = TRUE)
+summary(m.out_public_trim)
+bal.tab(m.out_public_trim, un = TRUE, disp.v.ratio = TRUE, m.threshold = .05,continuous = "std")
+
 d.w_public <- svydesign(ids = ~1, 
-		 weights = m.out_public$weights, data = dose_resp)
+		 weights = m.out_public_trim$weights, data = dose_resp)
 
 
 #Health Expenditure
@@ -94,8 +101,11 @@ m.out_health <- weightit(formula = as.formula(p_cor_health),
 					       ))
 summary(m.out_health)
 bal.tab(m.out_health, un = TRUE, disp.v.ratio = TRUE, m.threshold = .05,continuous = "std")
+m.out_health_trim <- trim(m.out_health, at = .9, lower = TRUE)
+summary(m.out_health_trim)
+bal.tab(m.out_health_trim, un = TRUE, disp.v.ratio = TRUE, m.threshold = .05,continuous = "std")
 d.w_health <- svydesign(ids = ~1, 
-		 weights = m.out_health$weights, data = dose_resp)
+		 weights = m.out_health_trim$weights, data = dose_resp)
 
 
 #Other Expenditure
@@ -112,8 +122,11 @@ m.out_other <- weightit(formula = as.formula(p_cor_other),
 					       ))
 summary(m.out_other)
 bal.tab(m.out_other, un = TRUE, disp.v.ratio = TRUE, m.threshold = .05,continuous = "std")
+m.out_other_trim <- trim(m.out_other, at = .9, lower = TRUE)
+summary(m.out_other_trim)
+bal.tab(m.out_other_trim, un = TRUE, disp.v.ratio = TRUE, m.threshold = .05,continuous = "std")
 d.w_other <- svydesign(ids = ~1, 
-		 weights = m.out_other$weights, data = dose_resp)
+		 weights = m.out_other_trim$weights, data = dose_resp)
 
 
 # Bivariate analysis for regression -----------------------
