@@ -409,6 +409,39 @@ wb1 <- wb1 %>%
       SURFACE = mean(SURFACE,na.rm = T)
       )
 
+wb1_loc <- data.frame(WB1_COUNTRIES = unique(wb1$LOCATION),
+			    WB1_COUNTRIES_2 = unique(wb1$LOCATION))
+	
+countries <- merge(countries_ihme, wb1_loc, by.x = "IHME", by.y = "WB1_COUNTRIES_2", all = T)
+
+wb1[which(wb1$LOCATION == "Bahamas, The"), 1] <- "Bahamas"
+wb1[which(wb1$LOCATION == "Bolivia"), 1] <- "Bolivia (Plurinational State of)"
+wb1[which(wb1$LOCATION == "Congo, Rep."), 1] <- "Congo"
+wb1[which(wb1$LOCATION == "Congo, Dem. Rep."), 1] <- "Democratic Republic of the Congo"
+wb1[which(wb1$LOCATION == "Cote d'Ivoire"), 1] <- "Côte d'Ivoire"
+wb1[which(wb1$LOCATION == "Czech Republic"), 1] <- "Czechia"
+wb1[which(wb1$LOCATION == "Korea, Dem. People’s Rep."), 1] <- "Democratic People's Republic of Korea"
+wb1[which(wb1$LOCATION == "Egypt, Arab Rep."), 1] <- "Egypt"
+wb1[which(wb1$LOCATION == "Gambia, The"), 1] <- "Gambia"
+wb1[which(wb1$LOCATION == "Iran, Islamic Rep."), 1] <- "Iran (Islamic Republic of)"
+wb1[which(wb1$LOCATION == "Kyrgyz Republic"), 1] <- "Kyrgyzstan"
+wb1[which(wb1$LOCATION == "Lao PDR"), 1] <- "Lao People's Democratic Republic"
+wb1[which(wb1$LOCATION == "Micronesia, Fed. Sts."), 1] <- "Micronesia (Federated States of)"
+wb1[which(wb1$LOCATION == "Moldova"), 1] <- "Republic of Moldova"
+wb1[which(wb1$LOCATION == "St. Kitts and Nevis"), 1] <- "Saint Kitts and Nevis"
+wb1[which(wb1$LOCATION == "St. Lucia"), 1] <- "Saint Lucia"
+wb1[which(wb1$LOCATION == "St. Vincent and the Grenadines"), 1] <- "Saint Vincent and the Grenadines"
+wb1[which(wb1$LOCATION == "Slovak Republic"), 1] <- "Slovakia"
+wb1[which(wb1$LOCATION == "Taiwan, China"), 1] <- "Taiwan (Province of China)"
+wb1[which(wb1$LOCATION == "Tanzania"), 1] <- "United Republic of Tanzania"
+wb1[which(wb1$LOCATION == "United States"), 1] <- "United States of America"
+wb1[which(wb1$LOCATION == "Virgin Islands (U.S.)"), 1] <- "United States Virgin Islands"
+wb1[which(wb1$LOCATION == "Venezuela, RB"), 1] <- "Venezuela (Bolivarian Republic of)"
+wb1[which(wb1$LOCATION == "Vietnam"), 1] <- "Viet Nam"
+wb1[which(wb1$LOCATION == "Yemen, Rep."), 1] <- "Yemen"
+countries <- NULL
+
+
 all_pop <- subset(population, population$age == "All Ages")
 all_pop <- subset(all_pop, all_pop$year %in% c(2010:2012))
 all_pop$val <- as.numeric(all_pop$val)
@@ -422,6 +455,31 @@ wb1 <- merge(wb1, all_pop, by = "LOCATION", all.x = T)
 wb1$POP_DENS <- wb1$pop/wb1$SURFACE #Populational density
 wb2 <- Reduce(function(x, y) merge(x, y, by = c("LOCATION", "YEAR"),  all=TRUE), 
       list(ODA))
+wb2[which(wb2$LOCATION == "Bahamas, The"), 1] <- "Bahamas"
+wb2[which(wb2$LOCATION == "Bolivia"), 1] <- "Bolivia (Plurinational State of)"
+wb2[which(wb2$LOCATION == "Congo, Rep."), 1] <- "Congo"
+wb2[which(wb2$LOCATION == "Congo, Dem. Rep."), 1] <- "Democratic Republic of the Congo"
+wb2[which(wb2$LOCATION == "Cote d'Ivoire"), 1] <- "Côte d'Ivoire"
+wb2[which(wb2$LOCATION == "Czech Republic"), 1] <- "Czechia"
+wb2[which(wb2$LOCATION == "Korea, Dem. People’s Rep."), 1] <- "Democratic People's Republic of Korea"
+wb2[which(wb2$LOCATION == "Egypt, Arab Rep."), 1] <- "Egypt"
+wb2[which(wb2$LOCATION == "Gambia, The"), 1] <- "Gambia"
+wb2[which(wb2$LOCATION == "Iran, Islamic Rep."), 1] <- "Iran (Islamic Republic of)"
+wb2[which(wb2$LOCATION == "Kyrgyz Republic"), 1] <- "Kyrgyzstan"
+wb2[which(wb2$LOCATION == "Lao PDR"), 1] <- "Lao People's Democratic Republic"
+wb2[which(wb2$LOCATION == "Micronesia, Fed. Sts."), 1] <- "Micronesia (Federated States of)"
+wb2[which(wb2$LOCATION == "Moldova"), 1] <- "Republic of Moldova"
+wb2[which(wb2$LOCATION == "St. Kitts and Nevis"), 1] <- "Saint Kitts and Nevis"
+wb2[which(wb2$LOCATION == "St. Lucia"), 1] <- "Saint Lucia"
+wb2[which(wb2$LOCATION == "St. Vincent and the Grenadines"), 1] <- "Saint Vincent and the Grenadines"
+wb2[which(wb2$LOCATION == "Slovak Republic"), 1] <- "Slovakia"
+wb2[which(wb2$LOCATION == "Taiwan, China"), 1] <- "Taiwan (Province of China)"
+wb2[which(wb2$LOCATION == "Tanzania"), 1] <- "United Republic of Tanzania"
+wb2[which(wb2$LOCATION == "United States"), 1] <- "United States of America"
+wb2[which(wb2$LOCATION == "Virgin Islands (U.S.)"), 1] <- "United States Virgin Islands"
+wb2[which(wb2$LOCATION == "Venezuela, RB"), 1] <- "Venezuela (Bolivarian Republic of)"
+wb2[which(wb2$LOCATION == "Vietnam"), 1] <- "Viet Nam"
+wb2[which(wb2$LOCATION == "Yemen, Rep."), 1] <- "Yemen"
 
 
 #Merging World Bank database with WHO database
@@ -493,8 +551,7 @@ base <- subset(base, base$pop > 1000000)
 #########################################################################
 base_matrix <- as.matrix(dplyr::select(base, -LOCATION))
 missing <- md.pattern(base_matrix,plot = T)
-temp_base <- mice::mice(base_matrix, m=10, maxit=10, meth='cart', seed=233)
-#summary(temp_base)
+temp_base <- mice::mice(base_matrix, m=20, maxit= 30, meth='cart', diagnostics = T, seed=233)
 completed_base <- mice::complete(temp_base,1)
 completed_base <- cbind(dplyr::select(base, LOCATION), completed_base) %>% as.data.frame()
 densityplot(temp_base)
