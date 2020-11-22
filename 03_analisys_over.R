@@ -146,36 +146,50 @@ p_cor_health_over_neo_u5 <- p_cor_ext_reg("MEAN_RATE_NEO_U5", "LOG_HEALTH_EXP_LA
 p_cor_other_over_neo_u5 <- p_cor_ext_reg("MEAN_RATE_NEO_U5", "LOG_OTHER_EXP_LAGGED")
 
 
-
 # Regression --------------------------------------------------------------
 #Neo - Public
 fit_public_over_neo <- svyglm(as.formula(p_cor_public_over_neo), design = d.w_public_over)
-summ(fit_public_over_neo, confint = TRUE,
+public_over_neo_impact <- summ(fit_public_over_neo, confint = TRUE,
 model.fit_public_over_neo = FALSE, model.info = FALSE, digits = 7) 
 
 #Neo - Health
 fit_health_over_neo <- svyglm(as.formula(p_cor_health_over_neo), design = d.w_health_over)
-summ(fit_health_over_neo, confint = TRUE,
+health_over_neo_impact <- summ(fit_health_over_neo, confint = TRUE,
 model.fit_health_over_neo = FALSE, model.info = FALSE, digits = 7) 
 
 #Neo - Other
 fit_other_over_neo <- svyglm(as.formula(p_cor_other_over_neo), design = d.w_other_over)
-summ(fit_other_over_neo, confint = TRUE,
+other_over_neo_impact <- summ(fit_other_over_neo, confint = TRUE,
 model.fit_other_over_neo = FALSE, model.info = FALSE, digits = 7) 
 
 
 #Neo_u5 - Public
 fit_public_over_neo_u5 <- svyglm(as.formula(p_cor_public_over_neo_u5), design = d.w_public_over)
-summ(fit_public_over_neo_u5, confint = TRUE,
+public_over_neo_u5_impact <- summ(fit_public_over_neo_u5, confint = TRUE,
 model.fit_public_over_neo_u5 = FALSE, model.info = FALSE, digits = 7) 
 
 #Neo_u5 - Health
 fit_health_over_neo_u5 <- svyglm(as.formula(p_cor_health_over_neo_u5), design = d.w_health_over)
-summ(fit_health_over_neo_u5, confint = TRUE,
+health_over_neo_u5_impact <- summ(fit_health_over_neo_u5, confint = TRUE,
 model.fit_health_over_neo_u5 = FALSE, model.info = FALSE, digits = 7) 
 
 #Neo_u5 - Other
 fit_other_over_neo_u5 <- svyglm(as.formula(p_cor_other_over_neo_u5), design = d.w_other_over)
-summ(fit_other_over_neo_u5, confint = TRUE,
+other_over_neo_u5_impact <- summ(fit_other_over_neo_u5, confint = TRUE,
 model.fit_other_over_neo_u5 = FALSE, model.info = FALSE, digits = 7) 
 
+
+#Extracting data from fit models
+impact_over <- rbind(public_over_neo_impact$coeftable[2,c(1,2,3)] %>% data.frame() %>% t(),
+      health_over_neo_impact$coeftable[2,c(1,2,3)] %>% data.frame() %>% t(),
+      other_over_neo_impact$coeftable[2,c(1,2,3)] %>% data.frame() %>% t(),
+      public_over_neo_u5_impact$coeftable[2,c(1,2,3)] %>% data.frame() %>% t(),
+      health_over_neo_u5_impact$coeftable[2,c(1,2,3)] %>% data.frame() %>% t(),
+      other_over_neo_u5_impact$coeftable[2,c(1,2,3)] %>% data.frame() %>% t()) %>% as.data.frame(row.names = F)
+impact_over$treatment <- c("Total public expenditure", 
+			    "Health public expenditure",
+			    "Public expenditure in other sectures")
+impact_over$mortality_rate <- c(rep("NeoRt",3),rep("NeoU5Rt",3))
+impact_over$gdp_range <- "Equal or above median"
+
+write.csv(impact_over, "bases/impact_over.csv", row.names = F)

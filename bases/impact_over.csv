@@ -1,0 +1,7 @@
+"Est.","2.5%","97.5%","treatment","mortality_rate","gdp_range"
+0.681164517513787,-3.77983260427512,5.1421616393027,"Total public expenditure","NeoRt","Equal or above median"
+-1.28072611755802,-3.706592564451,1.14514032933496,"Health public expenditure","NeoRt","Equal or above median"
+1.58114599135588,-1.69941969092468,4.86171167363645,"Public expenditure in other sectures","NeoRt","Equal or above median"
+0.846087186855885,-2.32412382969635,4.01629820340812,"Total public expenditure","NeoU5Rt","Equal or above median"
+-0.372907712865915,-1.93119292813922,1.18537750240739,"Health public expenditure","NeoU5Rt","Equal or above median"
+1.2551438796705,-1.05585992828862,3.56614768762962,"Public expenditure in other sectures","NeoU5Rt","Equal or above median"
