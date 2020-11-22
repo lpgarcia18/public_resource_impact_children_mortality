@@ -39,7 +39,6 @@ fertility <- read_csv("bases/IHME/IHME_GBD_2019_FERTILITY_1950_2019_TFR/IHME_GBD
 #http://apps.who.int/nha/database/Select/Indicators/en
 #Current Health Expenditure (CHE) as % Gross Domestic Product (GDP)
 #Out-of-pocket (OOPS) as % of Current Health Expenditure (CHE)
-#External Health Expenditure (EXT) as % of Current Health Expenditure (CHE)
 #Domestic General Government Health Expenditure (GGHE-D) as % Gross Domestic Product (GDP)
 #General Government Expenditure (GGE) as % Gross Domestic Product (GDP)
 #Gross Domestic Product (GDP) per Capita in PPP Int$
@@ -51,10 +50,6 @@ who <- read_csv("bases/WHO/EXP_WHO.csv")
 # World Bank Database -----------------------------------------------------
 new_cache <- wbcache()
 #wbsearch(pattern = "Strength of legal rights index")
-
-#TREATMENT
-#Net ODA received (% of GDP)
-ODA <- wb(indicator = "DT.ODA.ODAT.GN.ZS", startdate = 2013, enddate = 2017)
 
 #ECONOMIC/INCOME
 #GINI index (World Bank estimate)
@@ -314,7 +309,6 @@ countries <- NULL
 #Adjusting the variables from WHO
 who[which(who$Indicators == "Current Health Expenditure (CHE) as % Gross Domestic Product (GDP)"), 2] <- "CHE_PERC_GDP"
 who[which(who$Indicators == "Out-of-pocket (OOPS) as % of Current Health Expenditure (CHE)"), 2] <- "OOP_PERC_CHE"
-who[which(who$Indicators == "External Health Expenditure (EXT) as % of Current Health Expenditure (CHE)"), 2] <- "EHE_PERC_CHE"
 who[which(who$Indicators == "Domestic General Government Health Expenditure (GGHE-D) as % Gross Domestic Product (GDP)"), 2] <- "DGGHE_PERC_GDP"
 who[which(who$Indicators == "General Government Expenditure (GGE) as % Gross Domestic Product (GDP)"), 2] <- "GGE_PERC_GDP"
 who[which(who$Indicators == "Gross Domestic Product (GDP) per Capita in PPP Int$"), 2] <- "GDP"
@@ -323,24 +317,22 @@ who <- melt(who,id.vars = c("Countries","Indicators"))
 names(who)[3] <- "YEAR" 
 who$value <- as.numeric(gsub("\\,", "", who$value))
 who <- dcast(who, Countries + YEAR ~ Indicators, value.var = "value")
-who$GDP <- who$GDP * 1000000 #converting to U$
-who$CHE <- who$CHE_PERC_GDP*who$GDP/100 #Current Health Expenditure
-who$OOP <- who$OOP_PERC_CHE*who$CHE/100 #Out-of-pocket
-who$EHE <- who$EHE_PERC_CHE*who$CHE/100 #External Health Expenditure
-who$DGGHE <- who$DGGHE_PERC_GDP*who$GDP/100 #Domestic General Government Health Expenditure
-who$GGE <- who$GGE_PERC_GDP*who$GDP/100 #General Government Expenditure
-who <- who %>% dplyr::select("Countries", "YEAR", "GDP", "OOP","EHE","DGGHE","GGE")
+who$GDP_PER_CAP <- who$GDP #Adjusting the name of the variable
+who$CHE <- who$CHE_PERC_GDP*who$GDP_PER_CAP/100 #Current Health Expenditure
+who$OOP_PER_CAP <- who$OOP_PERC_CHE*who$CHE/100 #Out-of-pocket
+who$DGGHE <- who$DGGHE_PERC_GDP*who$GDP_PER_CAP/100 #Domestic General Government Health Expenditure
+who$GGE <- who$GGE_PERC_GDP*who$GDP_PER_CAP/100 #General Government Expenditure
+who <- who %>% dplyr::select("Countries", "YEAR", "GDP_PER_CAP", "OOP_PER_CAP","EHE","DGGHE","GGE")
 
 who[is.na(who)] <- 0
-who$HEALTH_EXP <- who$DGGHE + who$EHE #Domestic and external health expenditure
+who$HEALTH_EXP_PER_CAP <- who$DGGHE 
 who$EHE <- NULL
 who$DGGHE <- NULL
 names(who)[1] <- "LOCATION" 
 who <- subset(who, who$YEAR %in% c(2010:2017)) #Public expenditure and GDP
 
 
-#ODA and external factors
-ODA <- dplyr::select(ODA, YEAR = date, ODA = value, LOCATION = country)
+#External factors
 GINI <- dplyr::select(GINI, YEAR = date, GINI = value, LOCATION = country)
 POVERTY_GAP <- dplyr::select(POVERTY_GAP, YEAR = date, POVERTY_GAP = value, LOCATION = country)
 INFLATION <- dplyr::select(INFLATION, YEAR = date, INFLATION = value, LOCATION = country)
@@ -453,57 +445,13 @@ names(all_pop)[1] <- "LOCATION"
 wb1 <- merge(wb1, all_pop, by = "LOCATION", all.x = T)
 
 wb1$POP_DENS <- wb1$pop/wb1$SURFACE #Populational density
-wb2 <- Reduce(function(x, y) merge(x, y, by = c("LOCATION", "YEAR"),  all=TRUE), 
-      list(ODA))
-wb2[which(wb2$LOCATION == "Bahamas, The"), 1] <- "Bahamas"
-wb2[which(wb2$LOCATION == "Bolivia"), 1] <- "Bolivia (Plurinational State of)"
-wb2[which(wb2$LOCATION == "Congo, Rep."), 1] <- "Congo"
-wb2[which(wb2$LOCATION == "Congo, Dem. Rep."), 1] <- "Democratic Republic of the Congo"
-wb2[which(wb2$LOCATION == "Cote d'Ivoire"), 1] <- "Côte d'Ivoire"
-wb2[which(wb2$LOCATION == "Czech Republic"), 1] <- "Czechia"
-wb2[which(wb2$LOCATION == "Korea, Dem. People’s Rep."), 1] <- "Democratic People's Republic of Korea"
-wb2[which(wb2$LOCATION == "Egypt, Arab Rep."), 1] <- "Egypt"
-wb2[which(wb2$LOCATION == "Gambia, The"), 1] <- "Gambia"
-wb2[which(wb2$LOCATION == "Iran, Islamic Rep."), 1] <- "Iran (Islamic Republic of)"
-wb2[which(wb2$LOCATION == "Kyrgyz Republic"), 1] <- "Kyrgyzstan"
-wb2[which(wb2$LOCATION == "Lao PDR"), 1] <- "Lao People's Democratic Republic"
-wb2[which(wb2$LOCATION == "Micronesia, Fed. Sts."), 1] <- "Micronesia (Federated States of)"
-wb2[which(wb2$LOCATION == "Moldova"), 1] <- "Republic of Moldova"
-wb2[which(wb2$LOCATION == "St. Kitts and Nevis"), 1] <- "Saint Kitts and Nevis"
-wb2[which(wb2$LOCATION == "St. Lucia"), 1] <- "Saint Lucia"
-wb2[which(wb2$LOCATION == "St. Vincent and the Grenadines"), 1] <- "Saint Vincent and the Grenadines"
-wb2[which(wb2$LOCATION == "Slovak Republic"), 1] <- "Slovakia"
-wb2[which(wb2$LOCATION == "Taiwan, China"), 1] <- "Taiwan (Province of China)"
-wb2[which(wb2$LOCATION == "Tanzania"), 1] <- "United Republic of Tanzania"
-wb2[which(wb2$LOCATION == "United States"), 1] <- "United States of America"
-wb2[which(wb2$LOCATION == "Virgin Islands (U.S.)"), 1] <- "United States Virgin Islands"
-wb2[which(wb2$LOCATION == "Venezuela, RB"), 1] <- "Venezuela (Bolivarian Republic of)"
-wb2[which(wb2$LOCATION == "Vietnam"), 1] <- "Viet Nam"
-wb2[which(wb2$LOCATION == "Yemen, Rep."), 1] <- "Yemen"
-
-
-#Merging World Bank database with WHO database
-who <- merge(who, wb2, by = c("LOCATION", "YEAR"), all.x = T) #https://www.khanacademy.org/economics-finance-domain/macroeconomics/macro-economic-indicators-and-the-business-cycle/macro-real-vs-nominal-gdp/a/lesson-summary-real-vs-nominal-gdp
-#Calculating Public Expenditure and Public Health Expenditure
-who[which(is.na(who$ODA)), names(who)== "ODA"] <- 0 #Changing NA for 0 in ODA colum, to sum with Government general expenditure
-who$ODA <- who$ODA * who$GDP #multipling to obtein a monetary value
-who[who$ODA < 0, names(who) == "ODA"] <- 0 #Excluding negative values
-who$PUBLIC_EXP <- who$GGE + who$ODA #Internal and external resources for public expenditure
-who <- dplyr::select(who, LOCATION, YEAR, GDP, PUBLIC_EXP, HEALTH_EXP, OOP)
+who$PUBLIC_EXP_PER_CAP <- who$GGE 
+who <- dplyr::select(who, LOCATION, YEAR, GDP_PER_CAP, PUBLIC_EXP_PER_CAP, HEALTH_EXP, OOP_PER_CAP)
 #Excluding countries without information
 who <- na.omit(who)
-who <- subset(who, who$GDP != 0)
+who <- subset(who, who$GDP_PER_CAP != 0)
 who <- subset(who, who$PUBLIC_EXP != 0)
 who <- subset(who, who$HEALTH_EXP != 0)
-all_pop2 <- subset(population, population$age == "All Ages")
-all_pop2$age <- NULL
-names(all_pop2) <- c("LOCATION", "YEAR", "POP")
-who <- merge(who, all_pop2, by = c("LOCATION", "YEAR"))
-who$POP <- as.numeric(who$POP)
-who$GDP_PER_CAP <- who$GDP/who$POP #per capita
-who$PUBLIC_EXP_PER_CAP <- who$PUBLIC_EXP/who$POP # per capita
-who$HEALTH_EXP_PER_CAP <- who$HEALTH_EXP/who$POP # per capita
-who$OOP_PER_CAP <- who$OOP/who$POP # per capita
 
 
 #Estimanting lagged 
@@ -543,6 +491,7 @@ base <- subset(base, !is.na(base$pop))
 #Calculating expenditure with other sectors than health
 base$OTHER_EXP_LAGGED <- base$PUBLIC_EXP_PER_CAP_LAGGED - base$HEALTH_EXP_LAGGED
 
+#Selecting countries with more than 1000000 inhab
 base <- subset(base, base$pop > 1000000)
 
 
@@ -558,9 +507,18 @@ densityplot(temp_base)
 
 
 #########################################################################
-#Saving the databases
+#Variables'transformation
 #########################################################################
-write.csv(base, "bases/missing_base.csv", row.names = F)
+#Log transformation
+completed_base$LOG_GDP_PER_CAP_LAGGED <- log(completed_base$GDP_PER_CAP_LAGGED)
+completed_base$LOG_OOP_PER_CAP_LAGGED <- log(completed_base$OOP_PER_CAP_LAGGED)
+completed_base$LOG_PUBLIC_EXP_PER_CAP_LAGGED <- log(completed_base$PUBLIC_EXP_PER_CAP_LAGGED)
+completed_base$LOG_HEALTH_EXP_LAGGED <- log(completed_base$HEALTH_EXP_LAGGED)
+completed_base$LOG_OTHER_EXP_LAGGED <- log(completed_base$OTHER_EXP_LAGGED)
+
+#########################################################################
+#Saving database
+#########################################################################
 write.csv(completed_base, "bases/completed_base.csv", row.names = F)
 
 
