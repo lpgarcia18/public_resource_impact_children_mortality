@@ -15,6 +15,7 @@ library(wbstats)
 library(sf)
 library(spData)
 library(mice)
+library(VIM)
 #########################################################################
 #Data extraction
 #########################################################################
@@ -172,8 +173,6 @@ deaths <- deaths %>%
    summarize(MEAN_RATE_NEO = mean(RATE_NEO, na.rm = T),
       MEAN_RATE_NEO_U5 = mean(RATE_NEO_U5, na.rm = T))
 
-
-
 #Fertility rate
 fertility <- dplyr::select(fertility, c('year_id', 'val', 'location_name'))
 fertility$Total <- as.numeric(fertility$val)
@@ -322,7 +321,7 @@ who$CHE <- who$CHE_PERC_GDP*who$GDP_PER_CAP/100 #Current Health Expenditure
 who$OOP_PER_CAP <- who$OOP_PERC_CHE*who$CHE/100 #Out-of-pocket
 who$DGGHE <- who$DGGHE_PERC_GDP*who$GDP_PER_CAP/100 #Domestic General Government Health Expenditure
 who$GGE <- who$GGE_PERC_GDP*who$GDP_PER_CAP/100 #General Government Expenditure
-who <- who %>% dplyr::select("Countries", "YEAR", "GDP_PER_CAP", "OOP_PER_CAP","EHE","DGGHE","GGE")
+who <- who %>% dplyr::select("Countries", "YEAR", "GDP_PER_CAP", "OOP_PER_CAP","DGGHE","GGE")
 
 who[is.na(who)] <- 0
 who$HEALTH_EXP_PER_CAP <- who$DGGHE 
@@ -446,7 +445,7 @@ wb1 <- merge(wb1, all_pop, by = "LOCATION", all.x = T)
 
 wb1$POP_DENS <- wb1$pop/wb1$SURFACE #Populational density
 who$PUBLIC_EXP_PER_CAP <- who$GGE 
-who <- dplyr::select(who, LOCATION, YEAR, GDP_PER_CAP, PUBLIC_EXP_PER_CAP, HEALTH_EXP, OOP_PER_CAP)
+who <- who %>% dplyr::select(LOCATION, YEAR, GDP_PER_CAP, PUBLIC_EXP_PER_CAP, HEALTH_EXP_PER_CAP, OOP_PER_CAP)
 #Excluding countries without information
 who <- na.omit(who)
 who <- subset(who, who$GDP_PER_CAP != 0)
@@ -498,11 +497,11 @@ base <- subset(base, base$pop > 1000000)
 #########################################################################
 #Imputation
 #########################################################################
-base_matrix <- as.matrix(dplyr::select(base, -LOCATION))
-missing <- md.pattern(base_matrix,plot = T)
-temp_base <- mice::mice(base_matrix, m=20, maxit= 30, meth='cart', diagnostics = T, seed=233)
-completed_base <- mice::complete(temp_base,1)
-completed_base <- cbind(dplyr::select(base, LOCATION), completed_base) %>% as.data.frame()
+#Imputing values
+base_under_matrix <- as.matrix(dplyr::select(base, -c(LOCATION))) #excluding factors and linear combinations
+temp_base<- mice::mice(base_under_matrix, m=20, maxit= 30, meth= "cart", diagnostics = T, seed=233)
+completed_base<- mice::complete(temp_base)
+completed_base<- cbind(dplyr::select(base, c(LOCATION, OTHER_EXP_LAGGED)), completed_base) %>% as.data.frame()
 densityplot(temp_base)
 
 
@@ -517,9 +516,8 @@ completed_base$LOG_HEALTH_EXP_LAGGED <- log(completed_base$HEALTH_EXP_LAGGED)
 completed_base$LOG_OTHER_EXP_LAGGED <- log(completed_base$OTHER_EXP_LAGGED)
 
 #########################################################################
-#Saving database
+#Saving database_under
 #########################################################################
 write.csv(completed_base, "bases/completed_base.csv", row.names = F)
-
 
 
