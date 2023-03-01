@@ -50,7 +50,7 @@ who <- read_csv("bases/WHO/EXP_WHO.csv")
 
 # World Bank Database -----------------------------------------------------
 new_cache <- wbcache()
-#wbsearch(pattern = "Strength of legal rights index")
+wbsearch(pattern = "GINI")
 
 #ECONOMIC/INCOME
 #GINI index (World Bank estimate)
@@ -498,7 +498,7 @@ base <- subset(base, base$pop > 1000000)
 #Imputation
 #########################################################################
 #Imputing values
-base_under_matrix <- as.matrix(dplyr::select(base, -c(LOCATION))) #excluding factors and linear combinations
+base_under_matrix <- as.matrix(dplyr::select(base, -c(LOCATION))) 
 temp_base<- mice::mice(base_under_matrix, m=20, maxit= 30, meth= "cart", diagnostics = T, seed=233)
 completed_base<- mice::complete(temp_base)
 completed_base<- cbind(dplyr::select(base, c(LOCATION, OTHER_EXP_LAGGED)), completed_base) %>% as.data.frame()

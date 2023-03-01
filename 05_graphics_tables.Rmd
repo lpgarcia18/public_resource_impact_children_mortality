@@ -39,8 +39,8 @@ library(reshape2)
 #Databases
 base_efi <- read_csv("bases/completed_base.csv")
 impact <- read_csv("bases/impact.csv")
-impact <- read_csv("bases/impact_sensib_imputation.csv")
-impact <- read_csv("bases/impact_sensib_gps_model.csv")
+impact_sensib_imputation <- read_csv("bases/impact_sensib_imputation.csv")
+impact_sensib_gps_model <- read_csv("bases/impact_sensib_gps_model.csv")
 
 ```
 
@@ -218,16 +218,18 @@ ggarrange(plot1, plot4, labels = c("A"), nrow = 2, ncol = 1, common.legend = F, 
 ```{r fig.width=12, fig.height=12}
 impact_table <- impact
 impact_table$Est. <- round(impact_table$Est., 3) 
+impact_table$`0.5%` <- round(impact_table$`0.5%`, 3) 
+impact_table$`99.5%` <- round(impact_table$`99.5%`, 3) 
+impact_table$CI_99 <-  paste0("(",impact_table$`0.5%`,", ", impact_table$`99.5%`,")")
 impact_table$`2.5%` <- round(impact_table$`2.5%`, 3) 
 impact_table$`97.5%` <- round(impact_table$`97.5%`, 3) 
-impact_table$CI <-  paste0("(",impact_table$`2.5%`,", ", impact_table$`97.5%`,")")
-impact_table$"Impact\n(CI95%)" <- paste0(impact_table$Est., impact_table$CI, sep="\n")
-impact_table$Est. <- NULL
-impact_table$`2.5%` <- NULL
-impact_table$`97.5%` <- NULL
-impact_table$CI <- NULL
-names(impact_table) <- c("Treatment", "Mortality rate", "Impact\n(CI95%)")
-impact_table <- impact_table %>% dplyr::select("Treatment", "Mortality rate","Impact\n(CI95%)")
+impact_table$CI_95 <-  paste0("(",impact_table$`2.5%`,", ", impact_table$`97.5%`,")")
+impact_table$`5%` <- round(impact_table$`5%`, 3) 
+impact_table$`95%` <- round(impact_table$`95%`, 3) 
+impact_table$CI_90 <-  paste0("(",impact_table$`5%`,", ", impact_table$`95%`,")")
+impact_table$"Impact\n(CI99%)\n(CI95%)\n(CI90%)" <- paste0(impact_table$Est.,impact_table$CI_99, impact_table$CI_95,impact_table$CI_90, sep="\n")
+impact_table <- impact_table %>% dplyr::select(treatment, mortality_rate,"Impact\n(CI99%)\n(CI95%)\n(CI90%)")
+names(impact_table) <- c("Treatment", "Mortality rate","Impact\n(CI99%)\n(CI95%)\n(CI90%)")
 write.csv(impact_table, "bases/impact_table.csv", row.names = F)
 
 ```
@@ -236,16 +238,18 @@ write.csv(impact_table, "bases/impact_table.csv", row.names = F)
 ```{r fig.width=12, fig.height=12}
 impact_sensib_imputation_table <- impact_sensib_imputation
 impact_sensib_imputation_table$Est. <- round(impact_sensib_imputation_table$Est., 3) 
+impact_sensib_imputation_table$`0.5%` <- round(impact_sensib_imputation_table$`0.5%`, 3) 
+impact_sensib_imputation_table$`99.5%` <- round(impact_sensib_imputation_table$`99.5%`, 3) 
+impact_sensib_imputation_table$CI_99 <-  paste0("(",impact_sensib_imputation_table$`0.5%`,", ", impact_sensib_imputation_table$`99.5%`,")")
 impact_sensib_imputation_table$`2.5%` <- round(impact_sensib_imputation_table$`2.5%`, 3) 
 impact_sensib_imputation_table$`97.5%` <- round(impact_sensib_imputation_table$`97.5%`, 3) 
-impact_sensib_imputation_table$CI <-  paste0("(",impact_sensib_imputation_table$`2.5%`,", ", impact_sensib_imputation_table$`97.5%`,")")
-impact_sensib_imputation_table$"Impact\n(CI95%)" <- paste0(impact_sensib_imputation_table$Est., impact_sensib_imputation_table$CI, sep="\n")
-impact_sensib_imputation_table$Est. <- NULL
-impact_sensib_imputation_table$`2.5%` <- NULL
-impact_sensib_imputation_table$`97.5%` <- NULL
-impact_sensib_imputation_table$CI <- NULL
-names(impact_sensib_imputation_table) <- c("Treatment", "Mortality rate", "Impact\n(CI95%)")
-impact_sensib_imputation_table <- impact_sensib_imputation_table %>% dplyr::select("Treatment", "Mortality rate","Impact\n(CI95%)")
+impact_sensib_imputation_table$CI_95 <-  paste0("(",impact_sensib_imputation_table$`2.5%`,", ", impact_sensib_imputation_table$`97.5%`,")")
+impact_sensib_imputation_table$`5%` <- round(impact_sensib_imputation_table$`5%`, 3) 
+impact_sensib_imputation_table$`95%` <- round(impact_sensib_imputation_table$`95%`, 3) 
+impact_sensib_imputation_table$CI_90 <-  paste0("(",impact_sensib_imputation_table$`5%`,", ", impact_sensib_imputation_table$`95%`,")")
+impact_sensib_imputation_table$"Impact\n(CI99%)\n(CI95%)\n(CI90%)" <- paste0(impact_sensib_imputation_table$Est.,impact_sensib_imputation_table$CI_99, impact_sensib_imputation_table$CI_95,impact_sensib_imputation_table$CI_90, sep="\n")
+impact_sensib_imputation_table <- impact_sensib_imputation_table %>% dplyr::select(treatment, mortality_rate,"Impact\n(CI99%)\n(CI95%)\n(CI90%)")
+names(impact_sensib_imputation_table) <- c("Treatment", "Mortality rate","Impact\n(CI99%)\n(CI95%)\n(CI90%)")
 write.csv(impact_sensib_imputation_table, "bases/impact_sensib_imputation_table.csv", row.names = F)
 
 ```
@@ -254,16 +258,18 @@ write.csv(impact_sensib_imputation_table, "bases/impact_sensib_imputation_table.
 ```{r fig.width=12, fig.height=12}
 impact_sensib_gps_model_table <- impact_sensib_gps_model
 impact_sensib_gps_model_table$Est. <- round(impact_sensib_gps_model_table$Est., 3) 
+impact_sensib_gps_model_table$`0.5%` <- round(impact_sensib_gps_model_table$`0.5%`, 3) 
+impact_sensib_gps_model_table$`99.5%` <- round(impact_sensib_gps_model_table$`99.5%`, 3) 
+impact_sensib_gps_model_table$CI_99 <-  paste0("(",impact_sensib_gps_model_table$`0.5%`,", ", impact_sensib_gps_model_table$`99.5%`,")")
 impact_sensib_gps_model_table$`2.5%` <- round(impact_sensib_gps_model_table$`2.5%`, 3) 
 impact_sensib_gps_model_table$`97.5%` <- round(impact_sensib_gps_model_table$`97.5%`, 3) 
-impact_sensib_gps_model_table$CI <-  paste0("(",impact_sensib_gps_model_table$`2.5%`,", ", impact_sensib_gps_model_table$`97.5%`,")")
-impact_sensib_gps_model_table$"Impact\n(CI95%)" <- paste0(impact_sensib_gps_model_table$Est., impact_sensib_gps_model_table$CI, sep="\n")
-impact_sensib_gps_model_table$Est. <- NULL
-impact_sensib_gps_model_table$`2.5%` <- NULL
-impact_sensib_gps_model_table$`97.5%` <- NULL
-impact_sensib_gps_model_table$CI <- NULL
-names(impact_sensib_gps_model_table) <- c("Treatment", "Mortality rate", "Impact\n(CI95%)")
-impact_sensib_gps_model_table <- impact_sensib_gps_model_table %>% dplyr::select("Treatment", "Mortality rate","Impact\n(CI95%)")
+impact_sensib_gps_model_table$CI_95 <-  paste0("(",impact_sensib_gps_model_table$`2.5%`,", ", impact_sensib_gps_model_table$`97.5%`,")")
+impact_sensib_gps_model_table$`5%` <- round(impact_sensib_gps_model_table$`5%`, 3) 
+impact_sensib_gps_model_table$`95%` <- round(impact_sensib_gps_model_table$`95%`, 3) 
+impact_sensib_gps_model_table$CI_90 <-  paste0("(",impact_sensib_gps_model_table$`5%`,", ", impact_sensib_gps_model_table$`95%`,")")
+impact_sensib_gps_model_table$"Impact\n(CI99%)\n(CI95%)\n(CI90%)" <- paste0(impact_sensib_gps_model_table$Est.,impact_sensib_gps_model_table$CI_99, impact_sensib_gps_model_table$CI_95,impact_sensib_gps_model_table$CI_90, sep="\n")
+impact_sensib_gps_model_table <- impact_sensib_gps_model_table %>% dplyr::select(treatment, mortality_rate,"Impact\n(CI99%)\n(CI95%)\n(CI90%)")
+names(impact_sensib_gps_model_table) <- c("Treatment", "Mortality rate","Impact\n(CI99%)\n(CI95%)\n(CI90%)")
 write.csv(impact_sensib_gps_model_table, "bases/impact_sensib_gps_model_table.csv", row.names = F)
 
 ```
