@@ -210,8 +210,8 @@ p_cor_other_neo_u5 <- p_cor_ext_reg("MEAN_RATE_NEO_U5", "LOG_OTHER_EXP_LAGGED")
 fit_public_neo <- svyglm(as.formula(p_cor_public_neo), design = d.w_public)
 set.seed(456)
 fit_public_neo_step <- stepAIC(fit_public_neo, k = 2)
-public_neo_impact_90 <- summ(fit_public_neo_step, confint = TRUE,
-			     model.fit_public_neo = FALSE, model.info = FALSE, digits = 7, ci.width = 0.9) 
+public_neo_impact_999 <- summ(fit_public_neo_step, confint = TRUE,
+			     model.fit_public_neo = FALSE, model.info = FALSE, digits = 7, ci.width = 0.999) 
 public_neo_impact_95 <- summ(fit_public_neo_step, confint = TRUE,
 			     model.fit_public_neo = FALSE, model.info = FALSE, digits = 7, ci.width = 0.95) 
 public_neo_impact_99 <- summ(fit_public_neo_step, confint = TRUE,
@@ -221,8 +221,8 @@ public_neo_impact_99 <- summ(fit_public_neo_step, confint = TRUE,
 fit_health_neo <- svyglm(as.formula(p_cor_health_neo), design = d.w_health)
 set.seed(456)
 fit_health_neo_step <- stepAIC(fit_health_neo, k = 2)
-health_neo_impact_90 <- summ(fit_health_neo_step, confint = TRUE,
-			     model.fit_health_neo = FALSE, model.info = FALSE, digits = 7, ci.width = 0.9) 
+health_neo_impact_999 <- summ(fit_health_neo_step, confint = TRUE,
+			     model.fit_health_neo = FALSE, model.info = FALSE, digits = 7, ci.width = 0.999) 
 health_neo_impact_95 <- summ(fit_health_neo_step, confint = TRUE,
 			     model.fit_health_neo = FALSE, model.info = FALSE, digits = 7, ci.width = 0.95) 
 health_neo_impact_99 <- summ(fit_health_neo_step, confint = TRUE,
@@ -232,8 +232,8 @@ health_neo_impact_99 <- summ(fit_health_neo_step, confint = TRUE,
 fit_other_neo <- svyglm(as.formula(p_cor_other_neo), design = d.w_other)
 set.seed(456)
 fit_other_neo_step <- stepAIC(fit_other_neo, k = 2)
-other_neo_impact_90 <- summ(fit_other_neo_step, confint = TRUE,
-			    model.fit_other_neo = FALSE, model.info = FALSE, digits = 7, ci.width = 0.9) 
+other_neo_impact_999 <- summ(fit_other_neo_step, confint = TRUE,
+			    model.fit_other_neo = FALSE, model.info = FALSE, digits = 7, ci.width = 0.999) 
 other_neo_impact_95 <- summ(fit_other_neo_step, confint = TRUE,
 			    model.fit_other_neo = FALSE, model.info = FALSE, digits = 7, ci.width = 0.95)
 other_neo_impact_99 <- summ(fit_other_neo_step, confint = TRUE,
@@ -244,8 +244,8 @@ other_neo_impact_99 <- summ(fit_other_neo_step, confint = TRUE,
 fit_public_neo_u5 <- svyglm(as.formula(p_cor_public_neo_u5), design = d.w_public)
 set.seed(456)
 fit_public_neo_u5_step <- stepAIC(fit_public_neo_u5, k = 2)
-public_neo_u5_impact_90 <- summ(fit_public_neo_u5_step, confint = TRUE,
-				model.fit_public_neo_u5 = FALSE, model.info = FALSE, digits = 7, ci.width = 0.9) 
+public_neo_u5_impact_999 <- summ(fit_public_neo_u5_step, confint = TRUE,
+				model.fit_public_neo_u5 = FALSE, model.info = FALSE, digits = 7, ci.width = 0.999) 
 public_neo_u5_impact_95 <- summ(fit_public_neo_u5_step, confint = TRUE,
 				model.fit_public_neo_u5 = FALSE, model.info = FALSE, digits = 7, ci.width = 0.95) 
 public_neo_u5_impact_99 <- summ(fit_public_neo_u5_step, confint = TRUE,
@@ -255,8 +255,8 @@ public_neo_u5_impact_99 <- summ(fit_public_neo_u5_step, confint = TRUE,
 fit_health_neo_u5 <- svyglm(as.formula(p_cor_health_neo_u5), design = d.w_health)
 set.seed(456)
 fit_health_neo_u5_step <- stepAIC(fit_health_neo_u5, k = 2)
-health_neo_u5_impact_90 <- summ(fit_health_neo_u5_step, confint = TRUE,
-				model.fit_health_neo_u5 = FALSE, model.info = FALSE, digits = 7, ci.width = 0.9) 
+health_neo_u5_impact_999 <- summ(fit_health_neo_u5_step, confint = TRUE,
+				model.fit_health_neo_u5 = FALSE, model.info = FALSE, digits = 7, ci.width = 0.999) 
 health_neo_u5_impact_95 <- summ(fit_health_neo_u5_step, confint = TRUE,
 				model.fit_health_neo_u5 = FALSE, model.info = FALSE, digits = 7, ci.width = 0.95) 
 health_neo_u5_impact_99 <- summ(fit_health_neo_u5_step, confint = TRUE,
@@ -266,8 +266,8 @@ health_neo_u5_impact_99 <- summ(fit_health_neo_u5_step, confint = TRUE,
 fit_other_neo_u5 <- svyglm(as.formula(p_cor_other_neo_u5), design = d.w_other)
 set.seed(456)
 fit_other_neo_u5_step <- stepAIC(fit_other_neo_u5,  k=2)
-other_neo_u5_impact_90 <- summ(fit_other_neo_u5_step, confint = TRUE,
-			       model.fit_other_neo_u5 = FALSE, model.info = FALSE, digits = 7, ci.width = 0.9) 
+other_neo_u5_impact_999 <- summ(fit_other_neo_u5_step, confint = TRUE,
+			       model.fit_other_neo_u5 = FALSE, model.info = FALSE, digits = 7, ci.width = 0.999) 
 other_neo_u5_impact_95 <- summ(fit_other_neo_u5_step, confint = TRUE,
 			       model.fit_other_neo_u5 = FALSE, model.info = FALSE, digits = 7, ci.width = 0.95) 
 other_neo_u5_impact_99 <- summ(fit_other_neo_u5_step, confint = TRUE,
@@ -275,16 +275,16 @@ other_neo_u5_impact_99 <- summ(fit_other_neo_u5_step, confint = TRUE,
 
 
 #Extracting data from fit models
-impact_90 <- rbind(public_neo_impact_90$coeftable[2,c(1,2,3)] %>% data.frame() %>% t(),
-				     health_neo_impact_90$coeftable[2,c(1,2,3)] %>% data.frame() %>% t(),
-				     other_neo_impact_90$coeftable[2,c(1,2,3)] %>% data.frame() %>% t(),
-				     public_neo_u5_impact_90$coeftable[2,c(1,2,3)] %>% data.frame() %>% t(),
-				     health_neo_u5_impact_90$coeftable[2,c(1,2,3)] %>% data.frame() %>% t(),
-				     other_neo_u5_impact_90$coeftable[2,c(1,2,3)] %>% data.frame() %>% t()) %>% as.data.frame(row.names = F)
-impact_90$treatment <- c("Total public expenditure", 
+impact_999 <- rbind(public_neo_impact_999$coeftable[2,c(1,2,3)] %>% data.frame() %>% t(),
+				     health_neo_impact_999$coeftable[2,c(1,2,3)] %>% data.frame() %>% t(),
+				     other_neo_impact_999$coeftable[2,c(1,2,3)] %>% data.frame() %>% t(),
+				     public_neo_u5_impact_999$coeftable[2,c(1,2,3)] %>% data.frame() %>% t(),
+				     health_neo_u5_impact_999$coeftable[2,c(1,2,3)] %>% data.frame() %>% t(),
+				     other_neo_u5_impact_999$coeftable[2,c(1,2,3)] %>% data.frame() %>% t()) %>% as.data.frame(row.names = F)
+impact_999$treatment <- c("Total public expenditure", 
 					   "Health public expenditure",
 					   "Public expenditure in other sectores")
-impact_90$mortality_rate <- c(rep("NeoRt",3),rep("NeoU5Rt",3))
+impact_999$mortality_rate <- c(rep("NeoRt",3),rep("NeoU5Rt",3))
 
 impact_95 <- rbind(public_neo_impact_95$coeftable[2,c(1,2,3)] %>% data.frame() %>% t(),
 				     health_neo_impact_95$coeftable[2,c(1,2,3)] %>% data.frame() %>% t(),
@@ -308,7 +308,7 @@ impact_99$treatment <- c("Total public expenditure",
 					   "Public expenditure in other sectores")
 impact_99$mortality_rate <- c(rep("NeoRt",3),rep("NeoU5Rt",3))
 
-impact <- merge(impact_90,impact_95, by = c("treatment", "mortality_rate", "Est."))
+impact <- merge(impact_999,impact_95, by = c("treatment", "mortality_rate", "Est."))
 impact <- merge(impact,impact_99, by = c("treatment", "mortality_rate", "Est."))
 
 write.csv(impact, "bases/impact.csv", row.names = F)
