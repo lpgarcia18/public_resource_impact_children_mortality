@@ -46,6 +46,9 @@ fertility <- read_csv("bases/IHME/IHME_GBD_2019_FERTILITY_1950_2019_TFR/IHME_GBD
 
 #Relation
 #in million constant (2017) US$
+
+
+
 who <- read_csv("bases/WHO/EXP_WHO.csv")
 
 # World Bank Database -----------------------------------------------------
