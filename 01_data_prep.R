@@ -49,78 +49,78 @@ fertility <- read_csv("bases/IHME/IHME_GBD_2019_FERTILITY_1950_2019_TFR/IHME_GBD
 who <- read_csv("bases/WHO/EXP_WHO.csv")
 
 # World Bank Database -----------------------------------------------------
-new_cache <- wbcache()
+new_cache <- wb_cache()
 wbsearch(pattern = "GINI")
 
 #ECONOMIC/INCOME
 #GINI index (World Bank estimate)
-GINI <- wb(indicator = "SI.DST.10TH.10", startdate = 2010, enddate = 2012)
+GINI <- wb_data(indicator = "SI.DST.10TH.10", start_date = 2010, end_date = 2012)
 #Poverty gap at $1.90 a day (2011 PPP) (%)
-POVERTY_GAP <- wb(indicator = "SI.POV.GAPS", startdate = 2010, enddate = 2012)
+POVERTY_GAP <- wb_data(indicator = "SI.POV.GAPS", start_date = 2010, end_date = 2012)
 #Inflation, consumer prices (annual %)
-INFLATION <- wb(indicator = "FP.CPI.TOTL.ZG", startdate = 2010, enddate = 2012)
+INFLATION <- wb_data(indicator = "FP.CPI.TOTL.ZG", start_date = 2010, end_date = 2012)
 #Unemployment, total (% of total labor force) (modeled ILO estimate)
-UNEMPLOYMENT <- wb(indicator = "SL.UEM.TOTL.ZS", startdate = 2010, enddate = 2012)
+UNEMPLOYMENT <- wb_data(indicator = "SL.UEM.TOTL.ZS", start_date = 2010, end_date = 2012)
 
 #SANITATION
 #People using basic sanitation services (% of population)
-BASIC_SANITATION <- wb(indicator = "SH.STA.BASS.ZS", startdate = 2010, enddate = 2012)
+BASIC_SANITATION <- wb_data(indicator = "SH.STA.BASS.ZS", start_date = 2010, end_date = 2012)
 #People using basic drinking water services (% of population)
-BASIC_WATER <- wb(indicator = "SH.H2O.BASW.ZS", startdate = 2010, enddate = 2012)
+BASIC_WATER <- wb_data(indicator = "SH.H2O.BASW.ZS", start_date = 2010, end_date = 2012)
 
 #FEMALE EMPOWERMENT
 #Unemployment, female (% of female labor force) (modeled ILO estimate)
-UNEMPLOYMENT_FEM <- wb(indicator = "SL.UEM.TOTL.FE.ZS", startdate = 2010, enddate = 2012)
+UNEMPLOYMENT_FEM <- wb_data(indicator = "SL.UEM.TOTL.FE.ZS", start_date = 2010, end_date = 2012)
 #School life expectancy, secondary, female (years)
-SCHOOL_FEM <- wb(indicator = "UIS.SLE.23.F", startdate = 2010, enddate = 2012)
+SCHOOL_FEM <- wb_data(indicator = "UIS.SLE.23.F", start_date = 2010, end_date = 2012)
 #Proportion of seats held by women in national parliaments (%)
-WOMEN_PARLIAMENT <- wb(indicator = "SG.GEN.PARL.ZS", startdate = 2010, enddate = 2012)
+WOMEN_PARLIAMENT <- wb_data(indicator = "SG.GEN.PARL.ZS", start_date = 2010, end_date = 2012)
 
 #SCHOOL
 #School life expectancy, secondary, both sexes (years)
-SCHOOL_LIFE_EXP <- wb(indicator = "UIS.SLE.23", startdate = 2010, enddate = 2012)
+SCHOOL_LIFE_EXP <- wb_data(indicator = "UIS.SLE.23", start_date = 2010, end_date = 2012)
 #Rate of out-of-school adolescents of lower secondary school age, both sexes (%)
-OUT_OF_SCHOOL <- wb(indicator = "UIS.ROFST.2", startdate = 2010, enddate = 2012)
+OUT_OF_SCHOOL <- wb_data(indicator = "UIS.ROFST.2", start_date = 2010, end_date = 2012)
 
 #GOVERNANCE
 #Control of Corruption: Estimate	
-CONTROL_CORRUPTION <- wb(indicator = "CC.EST", startdate = 2010, enddate = 2012)
+CONTROL_CORRUPTION <- wb_data(indicator = "CC.EST", start_date = 2010, end_date = 2012)
 #Government Effectiveness: Estimate	
-GOV_EFFECTIVENESS <- wb(indicator = "GE.EST", startdate = 2010, enddate = 2012)
+GOV_EFFECTIVENESS <- wb_data(indicator = "GE.EST", start_date = 2010, end_date = 2012)
 #Political Stability and Absence of Violence/Terrorism: Estimate	
-POLITICAL_STABILITY <- wb(indicator = "PV.EST", startdate = 2010, enddate = 2012)
+POLITICAL_STABILITY <- wb_data(indicator = "PV.EST", start_date = 2010, end_date = 2012)
 #Regulatory Quality: Estimate	
-REGULATORY_QUALITY <- wb(indicator = "RQ.EST", startdate = 2010, enddate = 2012)
+REGULATORY_QUALITY <- wb_data(indicator = "RQ.EST", start_date = 2010, end_date = 2012)
 #Rule of Law: Estimate	
-RULE_OF_LAW <- wb(indicator = "RL.EST", startdate = 2010, enddate = 2012)
+RULE_OF_LAW <- wb_data(indicator = "RL.EST", start_date = 2010, end_date = 2012)
 
 #NUTRITION
 #Prevalence Of Undernourishment (% Of Population)
-UNDERNOURISHMENT <- wb(indicator = "SN.ITK.DEFC.ZS", startdate = 2010, enddate = 2012)
+UNDERNOURISHMENT <- wb_data(indicator = "SN.ITK.DEFC.ZS", start_date = 2010, end_date = 2012)
 
 #HEALTH
 #Physicians (per 1,000 people)
-DOCTORS <- wb(indicator = "SH.MED.PHYS.ZS", startdate = 2010, enddate = 2012)
+DOCTORS <- wb_data(indicator = "SH.MED.PHYS.ZS", start_date = 2010, end_date = 2012)
 #Births attended by skilled health staff (% of total)	
-DELIVERY_ASSISTANCE <- wb(indicator = "SH.STA.BRTC.ZS", startdate = 2010, enddate = 2012)
+DELIVERY_ASSISTANCE <- wb_data(indicator = "SH.STA.BRTC.ZS", start_date = 2010, end_date = 2012)
 #Prevalence of HIV, total (% of population ages 15-49)
-AIDS_PREVALENCE <- wb(indicator = "SH.DYN.AIDS.ZS", startdate = 2010, enddate = 2012)
+AIDS_PREVALENCE <- wb_data(indicator = "SH.DYN.AIDS.ZS", start_date = 2010, end_date = 2012)
 #Incidence of malaria (per 1,000 population at risk)	
-MALARIA_INCIDENCE <- wb(indicator = "SH.MLR.INCD.P3", startdate = 2010, enddate = 2012)
+MALARIA_INCIDENCE <- wb_data(indicator = "SH.MLR.INCD.P3", start_date = 2010, end_date = 2012)
 #Immunization, DPT (% of children ages 12-23 months)
-DPT <- wb(indicator = "SH.IMM.IDPT", startdate = 2010, enddate = 2012)
+DPT <- wb_data(indicator = "SH.IMM.IDPT", start_date = 2010, end_date = 2012)
 #Hospital beds (per 1,000 people)
-HOSPITAL_BEDS <- wb(indicator = "SH.MED.BEDS.ZS", startdate = 2010, enddate = 2012)
+HOSPITAL_BEDS <- wb_data(indicator = "SH.MED.BEDS.ZS", start_date = 2010, end_date = 2012)
 
 #ENGERGY
 #Access to electricity (% of total population)
-ELECTRICITY <- wb(indicator = "1.1_ACCESS.ELECTRICITY.TOT", startdate = 2010, enddate = 2012)
+ELECTRICITY <- wb_data(indicator = "1.1_ACCESS.ELECTRICITY.TOT", start_date = 2010, end_date = 2012)
 
 #DEMOGRAPHY
 #Urban population (% of total)
-URBAN_RATE <- wb(indicator = "SP.URB.TOTL.IN.ZS", startdate = 2010, enddate = 2012)
+URBAN_RATE <- wb_data(indicator = "SP.URB.TOTL.IN.ZS", start_date = 2010, end_date = 2012)
 #Surface area (sq. km)
-SURFACE <- wb(indicator = "AG.SRF.TOTL.K2", startdate = 2010, enddate = 2012)
+SURFACE <- wb_data(indicator = "AG.SRF.TOTL.K2", start_date = 2010, end_date = 2012)
 
 
 #Geografical centroid
@@ -332,32 +332,32 @@ who <- subset(who, who$YEAR %in% c(2010:2017)) #Public expenditure and GDP
 
 
 #External factors
-GINI <- dplyr::select(GINI, YEAR = date, GINI = value, LOCATION = country)
-POVERTY_GAP <- dplyr::select(POVERTY_GAP, YEAR = date, POVERTY_GAP = value, LOCATION = country)
-INFLATION <- dplyr::select(INFLATION, YEAR = date, INFLATION = value, LOCATION = country)
-UNEMPLOYMENT <- dplyr::select(UNEMPLOYMENT, YEAR = date, UNEMPLOYMENT = value, LOCATION = country)
-BASIC_SANITATION <- dplyr::select(BASIC_SANITATION, YEAR = date, BASIC_SANITATION = value, LOCATION = country)
-BASIC_WATER <- dplyr::select(BASIC_WATER, YEAR = date, BASIC_WATER = value, LOCATION = country)
-UNEMPLOYMENT_FEM <- dplyr::select(UNEMPLOYMENT_FEM, YEAR = date, UNEMPLOYMENT_FEM = value, LOCATION = country)
-SCHOOL_FEM <- dplyr::select(SCHOOL_FEM, YEAR = date, SCHOOL_FEM = value, LOCATION = country)
-WOMEN_PARLIAMENT <- dplyr::select(WOMEN_PARLIAMENT, YEAR = date, WOMEN_PARLIAMENT = value, LOCATION = country)
-SCHOOL_LIFE_EXP <- dplyr::select(SCHOOL_LIFE_EXP, YEAR = date, SCHOOL_LIFE_EXP = value, LOCATION = country)
-OUT_OF_SCHOOL <- dplyr::select(OUT_OF_SCHOOL, YEAR = date, OUT_OF_SCHOOL = value, LOCATION = country)
-CONTROL_CORRUPTION <- dplyr::select(CONTROL_CORRUPTION, YEAR = date, CONTROL_CORRUPTION  = value, LOCATION = country)
-GOV_EFFECTIVENESS <- dplyr::select(GOV_EFFECTIVENESS, YEAR = date, GOV_EFFECTIVENESS = value, LOCATION = country)
-POLITICAL_STABILITY <- dplyr::select(POLITICAL_STABILITY, YEAR = date, POLITICAL_STABILITY = value, LOCATION = country)
-REGULATORY_QUALITY <- dplyr::select(REGULATORY_QUALITY, YEAR = date, REGULATORY_QUALITY = value, LOCATION = country)
-RULE_OF_LAW <- dplyr::select(RULE_OF_LAW, YEAR = date, RULE_OF_LAW = value, LOCATION = country)
-UNDERNOURISHMENT <- dplyr::select(UNDERNOURISHMENT, YEAR = date, UNDERNOURISHMENT = value, LOCATION = country)
-DOCTORS <- dplyr::select(DOCTORS, YEAR = date, DOCTORS = value, LOCATION = country)
-DELIVERY_ASSISTANCE <- dplyr::select(DELIVERY_ASSISTANCE, YEAR = date, DELIVERY_ASSISTANCE = value, LOCATION = country)
-AIDS_PREVALENCE <- dplyr::select(AIDS_PREVALENCE, YEAR = date, AIDS_PREVALENCE = value, LOCATION = country)
-MALARIA_INCIDENCE <- dplyr::select(MALARIA_INCIDENCE, YEAR = date, MALARIA_INCIDENCE = value, LOCATION = country)
-DPT <- dplyr::select(DPT, YEAR = date, DPT = value, LOCATION = country)
-HOSPITAL_BEDS <- dplyr::select(HOSPITAL_BEDS, YEAR = date, HOSPITAL_BEDS = value, LOCATION = country)
-ELECTRICITY <- dplyr::select(ELECTRICITY, YEAR = date, ELECTRICITY = value, LOCATION = country)
-URBAN_RATE <- dplyr::select(URBAN_RATE, YEAR = date, URBAN_RATE = value, LOCATION = country)
-SURFACE <- dplyr::select(SURFACE, YEAR = date, SURFACE = value, LOCATION = country)
+GINI <- dplyr::select(GINI, YEAR = date, GINI = SI.DST.10TH.10, LOCATION = country)
+POVERTY_GAP <- dplyr::select(POVERTY_GAP, YEAR = date, POVERTY_GAP = SI.POV.GAPS, LOCATION = country)
+INFLATION <- dplyr::select(INFLATION, YEAR = date, INFLATION = FP.CPI.TOTL.ZG, LOCATION = country)
+UNEMPLOYMENT <- dplyr::select(UNEMPLOYMENT, YEAR = date, UNEMPLOYMENT = SL.UEM.TOTL.ZS, LOCATION = country)
+BASIC_SANITATION <- dplyr::select(BASIC_SANITATION, YEAR = date, BASIC_SANITATION = SH.STA.BASS.ZS, LOCATION = country)
+BASIC_WATER <- dplyr::select(BASIC_WATER, YEAR = date, BASIC_WATER = SH.H2O.BASW.ZS, LOCATION = country)
+UNEMPLOYMENT_FEM <- dplyr::select(UNEMPLOYMENT_FEM, YEAR = date, UNEMPLOYMENT_FEM = SL.UEM.TOTL.FE.ZS, LOCATION = country)
+SCHOOL_FEM <- dplyr::select(SCHOOL_FEM, YEAR = date, SCHOOL_FEM = UIS.SLE.23.F, LOCATION = country)
+WOMEN_PARLIAMENT <- dplyr::select(WOMEN_PARLIAMENT, YEAR = date, WOMEN_PARLIAMENT = SG.GEN.PARL.ZS, LOCATION = country)
+SCHOOL_LIFE_EXP <- dplyr::select(SCHOOL_LIFE_EXP, YEAR = date, SCHOOL_LIFE_EXP = UIS.SLE.23, LOCATION = country)
+OUT_OF_SCHOOL <- dplyr::select(OUT_OF_SCHOOL, YEAR = date, OUT_OF_SCHOOL = UIS.ROFST.2, LOCATION = country)
+CONTROL_CORRUPTION <- dplyr::select(CONTROL_CORRUPTION, YEAR = date, CONTROL_CORRUPTION  = CC.EST, LOCATION = country)
+GOV_EFFECTIVENESS <- dplyr::select(GOV_EFFECTIVENESS, YEAR = date, GOV_EFFECTIVENESS = GE.EST, LOCATION = country)
+POLITICAL_STABILITY <- dplyr::select(POLITICAL_STABILITY, YEAR = date, POLITICAL_STABILITY = PV.EST, LOCATION = country)
+REGULATORY_QUALITY <- dplyr::select(REGULATORY_QUALITY, YEAR = date, REGULATORY_QUALITY = RQ.EST, LOCATION = country)
+RULE_OF_LAW <- dplyr::select(RULE_OF_LAW, YEAR = date, RULE_OF_LAW = RL.EST, LOCATION = country)
+UNDERNOURISHMENT <- dplyr::select(UNDERNOURISHMENT, YEAR = date, UNDERNOURISHMENT = SN.ITK.DEFC.ZS, LOCATION = country)
+DOCTORS <- dplyr::select(DOCTORS, YEAR = date, DOCTORS = SH.MED.PHYS.ZS, LOCATION = country)
+DELIVERY_ASSISTANCE <- dplyr::select(DELIVERY_ASSISTANCE, YEAR = date, DELIVERY_ASSISTANCE = SH.STA.BRTC.ZS, LOCATION = country)
+AIDS_PREVALENCE <- dplyr::select(AIDS_PREVALENCE, YEAR = date, AIDS_PREVALENCE = SH.DYN.AIDS.ZS, LOCATION = country)
+MALARIA_INCIDENCE <- dplyr::select(MALARIA_INCIDENCE, YEAR = date, MALARIA_INCIDENCE = SH.MLR.INCD.P3, LOCATION = country)
+DPT <- dplyr::select(DPT, YEAR = date, DPT = SH.IMM.IDPT, LOCATION = country)
+HOSPITAL_BEDS <- dplyr::select(HOSPITAL_BEDS, YEAR = date, HOSPITAL_BEDS = SH.MED.BEDS.ZS, LOCATION = country)
+ELECTRICITY <- dplyr::select(ELECTRICITY, YEAR = date, ELECTRICITY = `1.1_ACCESS.ELECTRICITY.TOT`, LOCATION = country)
+URBAN_RATE <- dplyr::select(URBAN_RATE, YEAR = date, URBAN_RATE = SP.URB.TOTL.IN.ZS, LOCATION = country)
+SURFACE <- dplyr::select(SURFACE, YEAR = date, SURFACE = AG.SRF.TOTL.K2, LOCATION = country)
 
 wb1 <- Reduce(function(x, y) merge(x, y, by = c("LOCATION", "YEAR"),  all=TRUE), 
       list(GINI, POVERTY_GAP, INFLATION,
@@ -493,6 +493,21 @@ base$OTHER_EXP_LAGGED <- base$PUBLIC_EXP_PER_CAP_LAGGED - base$HEALTH_EXP_LAGGED
 #Selecting countries with more than 1000000 inhab
 base <- subset(base, base$pop > 1000000)
 
+#Adjusting Czechia
+czechia <- subset(base, LOCATION == "Czechia")
+
+for (i in 1:ncol(czechia)){
+	czechia[1,i] <- ifelse(czechia[1,i] == "NaN",czechia[2,i],czechia[1,i])
+}
+czechia <- czechia[1,]
+base <- subset(base, LOCATION  != "Czechia")
+base <- rbind(base, czechia) %>% as.data.frame()
+
+
+# Description -------------------------------------------------------------
+description <- describe(base) %>% as.data.frame()
+
+writexl::write_xlsx(description, "bases/description.xlsx",col_names = T)
 
 #########################################################################
 #Imputation

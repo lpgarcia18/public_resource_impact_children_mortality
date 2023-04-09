@@ -14,10 +14,11 @@ library(SuperLearner)
 library(jtools)
 library(survey)
 library(MASS)
-
+library(psych) 
 # Bases -----------------------------------------------------------------
 dose_resp <- read_csv("bases/completed_base.csv")
 dose_resp$LOCATION <- as.factor(dose_resp$LOCATION)
+
 
 # Bivariate analysis for match -----------------------
 #Problems with imputation
