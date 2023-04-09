@@ -22,10 +22,10 @@ library(VIM)
 # GBD -----------------------------------------------------------------
 #Population
 population <-
-    list.files(path = "bases/IHME/IHME_GBD_2019_POP_2010_2019_0",
-               pattern = "*.CSV", 
-               full.names = T) %>% 
-    map_df(~read_csv(., col_types = cols(.default = "c"))) 
+	list.files(path = "bases/IHME/IHME_GBD_2019_POP_2010_2019_0",
+		   pattern = "*.CSV", 
+		   full.names = T) %>% 
+	map_df(~read_csv(., col_types = cols(.default = "c"))) 
 
 
 #Number of death
@@ -149,8 +149,8 @@ number_deaths <- subset(number_deaths,number_deaths$sex == "Both")
 number_deaths$sex <- NULL
 number_deaths_neo <- subset(number_deaths, number_deaths$age %in% c("Early Neonatal","Late Neonatal"))
 number_deaths_neo <- number_deaths_neo %>%
-                        group_by(location, year) %>%
-                        dplyr::summarize(deaths_neo = sum(val))
+	group_by(location, year) %>%
+	dplyr::summarize(deaths_neo = sum(val))
 
 number_deaths_under_5 <- subset(number_deaths, number_deaths$age %in% c("Under 5"))
 names(number_deaths_under_5) <- c("location", "age", "year", "deaths_u5")
@@ -169,9 +169,9 @@ deaths$RATE_NEO_U5 <- deaths$RATE_NEO_U5
 
 deaths <- subset(deaths[,-c(3,4,5)], deaths$YEAR %in% c(2018,2019))
 deaths <- deaths %>%
-   group_by(LOCATION) %>%
-   summarize(MEAN_RATE_NEO = mean(RATE_NEO, na.rm = T),
-      MEAN_RATE_NEO_U5 = mean(RATE_NEO_U5, na.rm = T))
+	group_by(LOCATION) %>%
+	summarize(MEAN_RATE_NEO = mean(RATE_NEO, na.rm = T),
+		  MEAN_RATE_NEO_U5 = mean(RATE_NEO_U5, na.rm = T))
 
 #Fertility rate
 fertility <- dplyr::select(fertility, c('year_id', 'val', 'location_name'))
@@ -181,8 +181,8 @@ names(fertility) <- c('YEAR', 'LOCATION', 'FERTILITY_RATE')
 
 fertility <- subset(fertility, fertility$YEAR %in% c(2010:2012))
 fertility <- fertility %>%
-   group_by(LOCATION) %>%
-   summarize(FERTILITY_RATE_LAGGED = mean(FERTILITY_RATE, na.rm = T))
+	group_by(LOCATION) %>%
+	summarize(FERTILITY_RATE_LAGGED = mean(FERTILITY_RATE, na.rm = T))
 #65 years old + 
 population_65 <- subset(population,population$age %in% c("65 to 69", "70+ years", "All Ages"))
 population_65 <- subset(population_65, population_65$year %in% c(2010:2012))
@@ -193,7 +193,7 @@ population_65$`65 to 69` <- NULL
 population_65$`70+ years` <- NULL
 population_65$`All Ages` <- NULL
 names(population_65)[1] <- "LOCATION"
- 
+
 #Merging
 base <- merge(deaths, fertility, by = "LOCATION", all.x = T)
 base <- merge(base, population_65, by = "LOCATION", all.x = T)
@@ -245,8 +245,8 @@ countries <- NULL
 
 #Adjusting countries names from Countries Coord to merge with IHME
 countries_coord <- data.frame(COORD_COUNTRIES = unique(coord_countries$LOCATION),
-			    COORD_COUNTRIES_2 = unique(coord_countries$LOCATION))
-	
+			      COORD_COUNTRIES_2 = unique(coord_countries$LOCATION))
+
 countries <- merge(countries_ihme, countries_coord, by.x = "IHME", by.y = "COORD_COUNTRIES_2", all = T)
 
 coord_countries[which(coord_countries$LOCATION == "Bolivia"), 1] <- "Bolivia (Plurinational State of)"
@@ -360,49 +360,49 @@ URBAN_RATE <- dplyr::select(URBAN_RATE, YEAR = date, URBAN_RATE = SP.URB.TOTL.IN
 SURFACE <- dplyr::select(SURFACE, YEAR = date, SURFACE = AG.SRF.TOTL.K2, LOCATION = country)
 
 wb1 <- Reduce(function(x, y) merge(x, y, by = c("LOCATION", "YEAR"),  all=TRUE), 
-      list(GINI, POVERTY_GAP, INFLATION,
-         UNEMPLOYMENT, BASIC_SANITATION, BASIC_WATER,
-         UNEMPLOYMENT_FEM, SCHOOL_FEM, WOMEN_PARLIAMENT,
-         SCHOOL_LIFE_EXP, OUT_OF_SCHOOL, CONTROL_CORRUPTION,
-         GOV_EFFECTIVENESS, POLITICAL_STABILITY, REGULATORY_QUALITY,
-         RULE_OF_LAW, UNDERNOURISHMENT, DOCTORS, DELIVERY_ASSISTANCE,
-         AIDS_PREVALENCE, MALARIA_INCIDENCE, DPT, HOSPITAL_BEDS,
-         ELECTRICITY, URBAN_RATE, SURFACE))
+	      list(GINI, POVERTY_GAP, INFLATION,
+	           UNEMPLOYMENT, BASIC_SANITATION, BASIC_WATER,
+	           UNEMPLOYMENT_FEM, SCHOOL_FEM, WOMEN_PARLIAMENT,
+	           SCHOOL_LIFE_EXP, OUT_OF_SCHOOL, CONTROL_CORRUPTION,
+	           GOV_EFFECTIVENESS, POLITICAL_STABILITY, REGULATORY_QUALITY,
+	           RULE_OF_LAW, UNDERNOURISHMENT, DOCTORS, DELIVERY_ASSISTANCE,
+	           AIDS_PREVALENCE, MALARIA_INCIDENCE, DPT, HOSPITAL_BEDS,
+	           ELECTRICITY, URBAN_RATE, SURFACE))
 
 wb1 <- wb1 %>%
-   group_by(LOCATION) %>%
-   summarize(
-      GINI_LAGGED = mean(GINI,na.rm = T), 
-      POVERTY_GAP_LAGGED = mean(POVERTY_GAP,na.rm = T), 
-      INFLATION_LAGGED = mean(INFLATION,na.rm = T),
-      UNEMPLOYMENT_LAGGED = mean(UNEMPLOYMENT,na.rm = T), 
-      BASIC_SANITATION_LAGGED = mean(BASIC_SANITATION,na.rm = T), 
-      BASIC_WATER_LAGGED = mean(BASIC_WATER,na.rm = T),
-      UNEMPLOYMENT_FEM_LAGGED = mean(UNEMPLOYMENT_FEM,na.rm = T), 
-      SCHOOL_FEM_LAGGED = mean(SCHOOL_FEM,na.rm = T), 
-      WOMEN_PARLIAMENT_LAGGED = mean(WOMEN_PARLIAMENT,na.rm = T),
-      SCHOOL_LIFE_EXP_LAGGED = mean(SCHOOL_LIFE_EXP,na.rm = T), 
-      OUT_OF_SCHOOL_LAGGED = mean(OUT_OF_SCHOOL,na.rm = T), 
-      CONTROL_CORRUPTION_LAGGED = mean(CONTROL_CORRUPTION,na.rm = T),
-      GOV_EFFECTIVENESS_LAGGED = mean(GOV_EFFECTIVENESS,na.rm = T), 
-      POLITICAL_STABILITY_LAGGED = mean(POLITICAL_STABILITY,na.rm = T), 
-      REGULATORY_QUALITY_LAGGED = mean(REGULATORY_QUALITY,na.rm = T),
-      RULE_OF_LAW_LAGGED = mean(RULE_OF_LAW,na.rm = T), 
-      UNDERNOURISHMENT_LAGGED = mean(UNDERNOURISHMENT,na.rm = T), 
-      DOCTORS_LAGGED = mean(DOCTORS,na.rm = T), 
-      DELIVERY_ASSISTANCE_LAGGED = mean(DELIVERY_ASSISTANCE,na.rm = T),
-      AIDS_PREVALENCE_LAGGED = mean(AIDS_PREVALENCE,na.rm = T), 
-      MALARIA_INCIDENCE_LAGGED = mean(MALARIA_INCIDENCE,na.rm = T), 
-      DPT_LAGGED = mean(DPT,na.rm = T), 
-      HOSPITAL_BEDS_LAGGED = mean(HOSPITAL_BEDS,na.rm = T),
-      ELECTRICITY_LAGGED = mean(ELECTRICITY,na.rm = T),
-      URBAN_RATE_LAGGED = mean(URBAN_RATE,na.rm = T), 
-      SURFACE = mean(SURFACE,na.rm = T)
-      )
+	group_by(LOCATION) %>%
+	summarize(
+		GINI_LAGGED = mean(GINI,na.rm = T), 
+		POVERTY_GAP_LAGGED = mean(POVERTY_GAP,na.rm = T), 
+		INFLATION_LAGGED = mean(INFLATION,na.rm = T),
+		UNEMPLOYMENT_LAGGED = mean(UNEMPLOYMENT,na.rm = T), 
+		BASIC_SANITATION_LAGGED = mean(BASIC_SANITATION,na.rm = T), 
+		BASIC_WATER_LAGGED = mean(BASIC_WATER,na.rm = T),
+		UNEMPLOYMENT_FEM_LAGGED = mean(UNEMPLOYMENT_FEM,na.rm = T), 
+		SCHOOL_FEM_LAGGED = mean(SCHOOL_FEM,na.rm = T), 
+		WOMEN_PARLIAMENT_LAGGED = mean(WOMEN_PARLIAMENT,na.rm = T),
+		SCHOOL_LIFE_EXP_LAGGED = mean(SCHOOL_LIFE_EXP,na.rm = T), 
+		OUT_OF_SCHOOL_LAGGED = mean(OUT_OF_SCHOOL,na.rm = T), 
+		CONTROL_CORRUPTION_LAGGED = mean(CONTROL_CORRUPTION,na.rm = T),
+		GOV_EFFECTIVENESS_LAGGED = mean(GOV_EFFECTIVENESS,na.rm = T), 
+		POLITICAL_STABILITY_LAGGED = mean(POLITICAL_STABILITY,na.rm = T), 
+		REGULATORY_QUALITY_LAGGED = mean(REGULATORY_QUALITY,na.rm = T),
+		RULE_OF_LAW_LAGGED = mean(RULE_OF_LAW,na.rm = T), 
+		UNDERNOURISHMENT_LAGGED = mean(UNDERNOURISHMENT,na.rm = T), 
+		DOCTORS_LAGGED = mean(DOCTORS,na.rm = T), 
+		DELIVERY_ASSISTANCE_LAGGED = mean(DELIVERY_ASSISTANCE,na.rm = T),
+		AIDS_PREVALENCE_LAGGED = mean(AIDS_PREVALENCE,na.rm = T), 
+		MALARIA_INCIDENCE_LAGGED = mean(MALARIA_INCIDENCE,na.rm = T), 
+		DPT_LAGGED = mean(DPT,na.rm = T), 
+		HOSPITAL_BEDS_LAGGED = mean(HOSPITAL_BEDS,na.rm = T),
+		ELECTRICITY_LAGGED = mean(ELECTRICITY,na.rm = T),
+		URBAN_RATE_LAGGED = mean(URBAN_RATE,na.rm = T), 
+		SURFACE = mean(SURFACE,na.rm = T)
+	)
 
 wb1_loc <- data.frame(WB1_COUNTRIES = unique(wb1$LOCATION),
-			    WB1_COUNTRIES_2 = unique(wb1$LOCATION))
-	
+		      WB1_COUNTRIES_2 = unique(wb1$LOCATION))
+
 countries <- merge(countries_ihme, wb1_loc, by.x = "IHME", by.y = "WB1_COUNTRIES_2", all = T)
 
 wb1[which(wb1$LOCATION == "Bahamas, The"), 1] <- "Bahamas"
@@ -437,8 +437,8 @@ all_pop <- subset(population, population$age == "All Ages")
 all_pop <- subset(all_pop, all_pop$year %in% c(2010:2012))
 all_pop$val <- as.numeric(all_pop$val)
 all_pop <- all_pop %>%
-   group_by(location) %>%
-   summarise(pop = mean(val, na.rm = T))
+	group_by(location) %>%
+	summarise(pop = mean(val, na.rm = T))
 names(all_pop)[1] <- "LOCATION"
 
 wb1 <- merge(wb1, all_pop, by = "LOCATION", all.x = T)
@@ -457,18 +457,18 @@ who <- subset(who, who$HEALTH_EXP != 0)
 # Averages
 who_lagged1 <- subset(who, who$YEAR %in% c(2013:2017))
 who_lagged1 <- who_lagged1 %>%
-   group_by(LOCATION) %>%
-   summarize(
-      PUBLIC_EXP_PER_CAP_LAGGED = mean(PUBLIC_EXP_PER_CAP, na.rm = T),
-      HEALTH_EXP_LAGGED = mean(HEALTH_EXP_PER_CAP, na.rm = T))
+	group_by(LOCATION) %>%
+	summarize(
+		PUBLIC_EXP_PER_CAP_LAGGED = mean(PUBLIC_EXP_PER_CAP, na.rm = T),
+		HEALTH_EXP_LAGGED = mean(HEALTH_EXP_PER_CAP, na.rm = T))
 
 
 who_lagged2 <- subset(who, who$YEAR %in% c(2010:2012))
 who_lagged2 <- who_lagged2 %>% 
-   group_by(LOCATION) %>%
-   summarize(
-   	GDP_PER_CAP_LAGGED = mean(GDP_PER_CAP, na.rm = T),
-   	OOP_PER_CAP_LAGGED = mean(OOP_PER_CAP, na.rm = T))
+	group_by(LOCATION) %>%
+	summarize(
+		GDP_PER_CAP_LAGGED = mean(GDP_PER_CAP, na.rm = T),
+		OOP_PER_CAP_LAGGED = mean(OOP_PER_CAP, na.rm = T))
 
 
 
@@ -506,7 +506,7 @@ base <- rbind(base, czechia) %>% as.data.frame()
 
 # Description -------------------------------------------------------------
 description <- describe(base) %>% as.data.frame()
-
+description$variables <- rownames(description)
 writexl::write_xlsx(description, "bases/description.xlsx",col_names = T)
 
 #########################################################################
@@ -534,5 +534,6 @@ completed_base$LOG_OTHER_EXP_LAGGED <- log(completed_base$OTHER_EXP_LAGGED)
 #Saving database_under
 #########################################################################
 write.csv(completed_base, "bases/completed_base.csv", row.names = F)
+
 
 
